@@ -1,5 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project
+# Rippler Project
+Rippler - fullstack web application by ada, pet project.
 
+
+Rippler - is a web application, that introduce you 
+to the world of trading and stock exchanges.
+It can be named "Trading simulator".
+
+
+Everyone currency is unreal and your balance too.
+
+### Technologies
+* Next js - frontend framework
+* express js - backend framework
+* Redux toolkit - state manager
+* d3 - graphic library
+* web sockets
+
+## Possibilities
+* real-time trading
+* free balance
+* buy/sell assets
+* explore the world of traders
+
+
+# Next js RM:
 ## Getting Started
 
 First, run the development server:
