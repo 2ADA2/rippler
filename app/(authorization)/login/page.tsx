@@ -2,15 +2,21 @@
 import Link from "next/link";
 import {useActionState, useRef} from "react";
 import {signin} from "@/app/(authorization)/action/auth";
-import {useAppSelector} from "@/lib/hooks";
+import {useAppDispatch, useAppSelector} from "@/lib/hooks";
+import {loginUser} from "@/lib/features/user/auth";
 
 export default function Page() {
+    const dispatch = useAppDispatch();
     const [state, action, pending] = useActionState(signin, undefined)
-    const user = useAppSelector(state => state.userReducer.user)
+
+    const login = () => {
+        if(!state?.errors){
+            dispatch(loginUser)
+        }
+    }
     return (
         <>
             <form action={action}>
-                <h1>{user}</h1>
                 <div>
                     <label htmlFor="email">Email</label>
                     <input id="email" name="email" placeholder="Email"/>
@@ -20,7 +26,7 @@ export default function Page() {
                     <label htmlFor="password">Password</label>
                     <input id="password" name="password" type="password"/>
                 </div>
-                <button disabled={pending} type="submit">
+                <button disabled={pending} type="submit" onClick={login}>
                     Sign Up
                 </button>
             </form>

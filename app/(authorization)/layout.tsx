@@ -1,13 +1,16 @@
+"use client"
 import {Children} from "@/utils/models";
-import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
+import {useAppSelector} from "@/lib/hooks";
+import {Loading} from "@/components/loading";
 
-export default async function AuthLayout({children,}: Children) {
-    const cookieService = await cookies()
-    const token = cookieService.get("token")
-    if(token){
+export default function AuthLayout({children,}: Children) {
+    const {isLoading, isLoggedIn, loadingStatus} = useAppSelector(state => state.userReducer)
+    if(isLoggedIn){
         redirect("/dashboard")
     }
-
+    if(isLoading){
+        return <Loading loadingStatus={loadingStatus}/>;
+    }
     return children
 }

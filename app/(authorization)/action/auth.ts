@@ -2,6 +2,7 @@ import {FormState, SignInFormSchema, SignupFormSchema} from "@/app/_lib/definiti
 import axios from "axios";
 import {API_URL} from "@/utils/env";
 import {redirect} from "next/navigation";
+import {useAppDispatch} from "@/lib/hooks";
 
 export async function signup(state: FormState, formData: FormData) {
     const url:string = API_URL
@@ -16,11 +17,7 @@ export async function signup(state: FormState, formData: FormData) {
         }
     }
 
-    axios.post(url+"/register", formData).then((res) => {
-        if (res.data.message) {
-            redirect("/login")
-        }
-    })
+    const dispatch = useAppDispatch()
 }
 
 export async function signin(state: FormState, formData: FormData) {

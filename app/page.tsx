@@ -3,6 +3,7 @@ import {useState} from "react";
 
 export default function Page() {
     const [counter, setCounter] = useState(1);
+    console.log(123)
 
     return (
         <div className="flex flex-col gap-1 justify-center items-center">
