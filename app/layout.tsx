@@ -1,17 +1,18 @@
 import React from "react";
-import {Geist} from 'next/font/google'
+import {JetBrains_Mono} from 'next/font/google'
 import './globals.scss'
 import {Children} from "@/utils/models";
 import StoreProvider from "@/app/StoreProvider";
 import {Header} from "@/components/Header";
+import {NextFont} from "next/dist/compiled/@next/font";
 
-const geist = Geist({
-    subsets: ['latin'],
+const jb:NextFont = JetBrains_Mono({
+    subsets: ["greek"],
 })
 export default async function Layout({children}: Children) {
 
     return (
-        <html lang="en" className={geist.className}>
+        <html lang="en" className={jb.className}>
         <body>
         <StoreProvider>
             <Header></Header>
