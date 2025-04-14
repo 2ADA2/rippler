@@ -21,7 +21,7 @@ export const FastPanel = () => {
                     >Recommended
                     </button>
                 </div>
-                <div className={"flex-col "}>
+                <div className={"flex flex-col gap-2"}>
                     {popularPositions.map(
                         (position:FPEInterface) => {
                         return (<FPElement {...position} key={position.name}/>)

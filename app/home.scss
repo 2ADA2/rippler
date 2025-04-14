@@ -39,10 +39,28 @@
     align-items: center;
 
     & .fast-panel {
+      display: grid;
+      grid-template-rows:50px auto;
       padding: 20px;
       width:500px;
-      background: rgba(30, 30, 30);
+      background: rgb(10, 20, 40);
       border-radius: 20px;
+
+      & .fpe{
+        font-size: 18px;
+        & img{
+          width: 50px;
+          height: 50px;
+        }
+
+        & .upper{
+          color: #27ff27;
+        }
+
+        & .lower{
+          color: #ff5050;
+        }
+      }
     }
   }
 }

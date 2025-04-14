@@ -1,9 +1,9 @@
 "use client"
 
-import Image from "next/image";
+import Image, {StaticImageData} from "next/image";
 
 export interface FPEInterface{
-    imgUrl: string;
+    imgUrl: StaticImageData;
     short:string;
     name:string;
     price:string;
@@ -11,15 +11,18 @@ export interface FPEInterface{
 }
 
 export const FPElement = ({...props}:FPEInterface) => {
+    const isGrow:boolean = props.activity.split("")[0]!="-"
     return (
         <div className={"fpe flex justify-between items-center"}>
-            <div className={"flex gap-1 items-center"}>
-                <Image src={props.imgUrl} alt={"logo"} width={"50"} height={"50"} />
+            <div className={"flex gap-5 items-center"}>
+                <Image src={props.imgUrl} alt={"logo"} width={"100"} height={"100"} />
                 <h5>{props.short}</h5>
                 <span>{props.name}</span>
             </div>
-            <span>{props.price}</span>
-            <span>{props.activity}</span>
+            <div className={"flex gap-5"}>
+                <span>{props.price}</span>
+                <span className={isGrow ? "upper" : "lower"}>{props.activity}</span>
+            </div>
         </div>
     );
 };
