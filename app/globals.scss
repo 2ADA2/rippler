@@ -45,6 +45,11 @@ a:hover {
   flex-direction: column;
   width: 100vw;
 }
+@media(max-width: 800px) {
+  .standard-container{
+    padding: 20px;
+  }
+}
 
 .light-button {
   font-size: 18px;
