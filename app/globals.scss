@@ -35,7 +35,7 @@ a:hover {
 
 .standard-container {
   max-width: 2000px;
-  padding: 20px 10%;
+  padding: 20px 10vw;
 }
 
 .standard-template {
@@ -43,7 +43,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 100vw;
+  width: 100%;
 }
 @media(max-width: 800px) {
   .standard-container{

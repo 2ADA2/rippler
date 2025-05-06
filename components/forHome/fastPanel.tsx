@@ -3,6 +3,7 @@
 import {useState} from "react";
 import {popularPositions} from "@/utils/testData";
 import {FPEInterface, FPElement} from "@/components/forHome/fpElement";
+import {useAppSelector} from "@/lib/hooks";
 
 export const FastPanel = () => {
     const [active, setActive] = useState<string>("popular");
