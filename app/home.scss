@@ -154,7 +154,8 @@ h2 {
 
   & .ab-list {
     display: flex;
-    gap: 20px;
+    gap: 40px;
+    margin-top: 40px;
 
     & h3 {
       font-size: clamp(16px, 5vw, 18px);
@@ -164,16 +165,21 @@ h2 {
       font-weight: 100;
     }
 
-    & div {
+    & .ab-container, .ab-item {
       display: grid;
       grid-template-rows:20px auto;
       grid-template-columns: 1fr 1fr;
       grid-column-gap: 40px;
       grid-row-gap: 10px;
 
-      & .ab-item {
+      & .ab-item, .illustration, .stock-simulation {
         grid-column: 2/3;
         grid-row: 1/3;
+        position: relative;
+      }
+
+      & .illustration {
+        display: flex;
       }
 
       & .clock {
@@ -181,13 +187,17 @@ h2 {
         height: 50px;
         border-radius: 50%;
         border: 3px solid white;
+        background: black;
         position: relative;
-        scale: 1.8;
         display: flex;
         justify-content: center;
         align-items: center;
+        transform: scale(2, 1.5);
+        box-shadow: 0 5px 0px 2px rgba(255, 255, 255, 0.75);
+        left: 20px;
+        z-index: 2;
 
-        &:before {
+        &:after {
           content: '';
           position: relative;
           display: block;
@@ -205,6 +215,7 @@ h2 {
           width: 50px;
           height: 50px;
 
+
           &:before {
             content: '';
             display: block;
@@ -214,6 +225,7 @@ h2 {
             border-radius: 2px;
             position: relative;
             right: 10px;
+            box-shadow: 0 0 5px white;
           }
         }
 
@@ -226,5 +238,97 @@ h2 {
         }
       }
     }
+
+    ul {
+      position: absolute;
+      bottom: 0;
+    }
+
+    .selection-images {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      width: 150px;
+      position: relative;
+
+      & svg {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+      }
+
+      & :nth-child(1) {
+        left: 0;
+        bottom: 0;
+      }
+
+      & :nth-child(2) {
+        left: 50px;
+        bottom: 50px;
+      }
+
+      & :nth-child(3) {
+        left: 50px;
+        bottom: 0;
+      }
+
+      & :nth-child(4) {
+        left: 0;
+        bottom: 50px;
+      }
+    }
+
+    & .stock-simulation {
+      display: flex;
+      flex-direction: column;
+      max-width: 300px;
+      gap: 5px;
+
+
+      & .stock-row {
+        font-size: 14px;
+        display: grid;
+        grid-template-columns: 70px 80px 50px 50px 10px;
+        gap: 10px;
+        width: 370px;
+        background: linear-gradient(to left, #2b042f, #1a042f);
+        border-radius: 2px;
+        justify-content: space-between;
+        padding: 10px 20px;
+
+        & svg {
+          rotate: 90deg;
+          color: #ff3131;
+          position: relative;
+          animation: falling-animation 0.3s linear;
+        }
+
+        & .isGrow svg {
+          rotate: -90deg;
+          color: #27ff27;
+          animation: grow-animation 0.3s linear;
+        }
+
+      }
+    }
+
+  }
+}
+
+@keyframes grow-animation {
+  0% {
+    top: 5px;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes falling-animation {
+  0% {
+    bottom: 5px;
+  }
+  100% {
+    bottom: 0;
   }
 }
