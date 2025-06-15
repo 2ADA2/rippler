@@ -14,7 +14,7 @@ Everyone currency is unreal and your balance too.
 * Next js - frontend framework
 * express js - backend framework
 * Redux toolkit - state manager
-* d3 - graphic library
+* Trading View 
 * web sockets
 
 ## Possibilities
