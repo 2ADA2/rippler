@@ -1,4 +1,5 @@
 import {ReactNode} from "react";
+import {CandlestickData} from "lightweight-charts";
 
 interface Post {
     id: string;
@@ -9,4 +10,7 @@ interface Post {
 }
 export interface Children {
     children: ReactNode
+}
+export type ChartData = {
+    data: CandlestickData[]
 }
