@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/achievemtns/achievements";
 
 :root {
   --background: #ffffff;
@@ -93,4 +94,11 @@ a:hover {
   width: 100%;
   height: 100%;
   font-weight: 100;
+  min-height: 300px;
+  & svg{
+    display: none;
+  }
+}
+.test {
+  width: 100%;
 }

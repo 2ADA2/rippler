@@ -1,0 +1,91 @@
+.achieve{
+  position: relative;
+  border: 1px solid white;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: help;
+  & div {
+    display: none;
+  }
+
+  &:hover{
+    & div{
+      display: block;
+      position: absolute;
+      top:50px;
+      width: 500px;
+      height: auto;
+      background-color: rgb(16, 16, 16);
+      padding: 20px;
+      overflow: hidden;
+      font-size: 16px;
+      & ul{
+        position: relative;
+      }
+    }
+  }
+}
+
+.A{
+  & span{
+    font-size: 32px;
+  }
+}
+.A span{
+    -webkit-background-clip: text;
+    background-image: linear-gradient(#ff0088, #ff8b8b);
+    -webkit-text-fill-color: #0000;
+    -webkit-user-select: none;
+}
+
+.ind1{
+  & svg, h5{
+    color: #cbffdb;
+  }
+}
+.ind2{
+  & svg, h5{
+    color: #e97dff;
+  }
+}
+.ind3{
+  & svg, h5{
+    color: #ff328a;
+  }
+}
+
+.money1{
+  & svg, h5{
+    color: #e1ffe9;
+  }
+}
+.money2{
+  & svg, h5{
+    color: #ffe8b7;
+  }
+}
+.money3{
+  & svg, h5{
+    color: #c6fff5;
+  }
+}
+.money4{
+  & svg, h5{
+    color: #ff84fd;
+  }
+}
+.money5{
+  & svg, h5{
+    color: #ff328a;
+  }
+}
+
+.stock {
+  background: linear-gradient(#32594d, #000000);
+}

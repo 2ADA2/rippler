@@ -1,18 +1,23 @@
 import React from "react";
-import {JetBrains_Mono} from 'next/font/google'
 import './globals.scss'
 import {Children} from "@/utils/models";
 import StoreProvider from "@/app/StoreProvider";
 import {Header} from "@/components/Header";
 import {NextFont} from "next/dist/compiled/@next/font";
+import { Inter } from 'next/font/google';
 
-const jb:NextFont = JetBrains_Mono({
-    subsets: ["greek"],
-})
+
+const inter:NextFont= Inter({
+    subsets: ['latin'],
+    weight: ['100', '400', '600'],
+    variable: '--font-inter',
+});
+
+
 export default async function Layout({children}: Children) {
 
     return (
-        <html lang="en" className={jb.className}>
+        <html lang="en" className={inter.className}>
         <body>
         <StoreProvider>
             <Header></Header>

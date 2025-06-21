@@ -5,7 +5,6 @@ import {createChart, CandlestickSeries, CandlestickData} from 'lightweight-chart
 import {testChartData} from "@/utils/testData";
 import {ChartData} from "@/utils/models";
 
-
 export const SChart: React.FC<ChartData> = ({data}) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -21,10 +20,10 @@ export const SChart: React.FC<ChartData> = ({data}) => {
             },
             grid: {
                 vertLines: {
-                    visible: false
+                    color: 'rgba(255,255,255,0.2)',
                 },
                 horzLines: {
-                    visible: false
+                    color: 'rgba(255,255,255,0.2)',
                 }
             }
         });
@@ -54,33 +53,35 @@ export const SChart: React.FC<ChartData> = ({data}) => {
 
         chart.applyOptions({
             timeScale: {
-                timeVisible: false, // скрыть часы и дни
-                secondsVisible: false
+                timeVisible: false,
+                secondsVisible: false,
             },
             localization: {
                 locale: "en-US",
                 priceFormatter:myPriceFormatter
             },
             layout:{
-                fontFamily:"JetBrains Mono"
+                fontFamily:"Inter"
+            },
+            crosshair:{
+                mode:0,
             }
         })
 
-        window.addEventListener('resize', () => handleResize());
-
-        const handleResize = () => {
+        const resizeObserver = new ResizeObserver(() => {
             if (containerRef.current) {
-                chart.resize(
-                    containerRef.current.clientWidth,
-                    containerRef.current.clientHeight
-                );
+                chart.resize(containerRef.current.clientWidth, containerRef.current.clientHeight);
             }
-        };
+        });
+
+        resizeObserver.observe(containerRef.current);
+
         return () => {
-            window.removeEventListener("resize", () => handleResize())
-        }
+            resizeObserver.disconnect();
+            chart.remove();
+        };
 
     }, []);
 
-    return <div ref={containerRef} style={{width: '100%'}} className={"chart"}/>;
+    return <div ref={containerRef} className={"chart"}/>;
 }
