@@ -1,0 +1,30 @@
+header{
+  height: 110px;
+  padding: 20px 40px;
+
+  & .rippler{
+    font-size: 32px;
+
+  }
+
+  & .user-header-info{
+    height: 70px;
+    & span, a{
+      grid-column: 1/2;
+      text-align: end;
+      margin-right: 10px;
+    }
+
+    & .user-header-img{
+      display: block;
+      height: 100%;
+      width: 100%;
+      aspect-ratio: 1/1;
+      grid-column: 2/3;
+      grid-row: 1/4;
+    }
+  }
+}
+
+
+

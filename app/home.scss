@@ -172,7 +172,9 @@ h2 {
     & p {
       font-weight: 100;
     }
-
+    & .ab-container{
+      min-height: 100px;
+    }
     & .ab-container, .ab-item {
       display: grid;
       grid-template-rows:20px auto;
@@ -323,6 +325,7 @@ h2 {
     }
   }
   .achievements {
+    margin-top:20px;
     display: flex;
     width: 100%;
     gap:4px;
@@ -393,6 +396,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
+  max-width: 2000px;
   padding: 0 40px;
   height: 600px;
 

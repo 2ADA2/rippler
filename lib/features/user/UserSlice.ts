@@ -7,6 +7,9 @@ export interface UserData {
     loadingStatus: string
     error: string | null
     isLoggedIn: boolean
+    name: string
+    euro: number
+    rippler: number
 
 }
 
@@ -16,6 +19,9 @@ const initialState: UserData = {
     loadingStatus: "",
     isLoggedIn: false,
     error: null,
+    name: "ada",
+    euro: 1000,
+    rippler: 10,
 }
 
 export const userSlice = createSlice({
