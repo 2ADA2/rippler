@@ -1,7 +1,7 @@
 "use client"
 import "./home.scss"
 import Image from "next/image";
-import NEXTIMG from "../public/nextico.svg"
+import NEXTIMG from "../public/ripplerico.svg"
 import {FastPanel} from "@/components/forHome/fastPanel";
 import {useAppSelector} from "@/lib/hooks";
 import {useEffect, useState} from "react";
@@ -182,10 +182,14 @@ export default function Page() {
                                     <>
                                         <p>It's never too late to start.</p>
                                         <button>
-                                            Start over!
+                                            <Link href = "/registration">
+                                                Start over!
+                                            </Link>
                                         </button>
                                         <button>
-                                            Log in
+                                            <Link href = "/login">
+                                                Log in
+                                            </Link>
                                         </button>
                                     </>
                             }

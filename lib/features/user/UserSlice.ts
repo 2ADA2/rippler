@@ -10,7 +10,6 @@ export interface UserData {
     name: string
     euro: number
     rippler: number
-
 }
 
 const initialState: UserData = {
@@ -21,7 +20,7 @@ const initialState: UserData = {
     error: null,
     name: "ada",
     euro: 1000,
-    rippler: 10,
+    rippler: 0,
 }
 
 export const userSlice = createSlice({

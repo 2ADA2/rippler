@@ -27,7 +27,7 @@ export default function Page() {
                     <input id="password" name="password" type="password"/>
                 </div>
                 <button disabled={pending} type="submit" onClick={login}>
-                    Sign Up
+                    Sign In
                 </button>
             </form>
             <div className="errors">

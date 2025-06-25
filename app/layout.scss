@@ -4,7 +4,15 @@ header{
 
   & .rippler{
     font-size: 32px;
+    &:hover{
+      text-decoration: none;
+    }
 
+  }
+
+  & nav{
+    display: flex;
+    gap:1vw;
   }
 
   & .user-header-info{
