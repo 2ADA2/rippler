@@ -4,6 +4,16 @@ import BTC from "../public/images/bitcoin.png"
 import LTC from "../public/images/litecoin.png"
 import {CandlestickData} from "lightweight-charts";
 
+export const traderData = {
+    name: "Rippler",
+    shortName: "RPL",
+    price: 20.53,
+    lastDay: 21.41,
+    lastMax: 22.58,
+    lastMin: 20.15,
+    salesVol:20485,
+}
+
 export const popularPositions: FPEInterface[] = [
     {
         imgUrl: BTC,
