@@ -77,7 +77,7 @@ h2 {
         display: flex;
         gap: 40px;
         font-size: clamp(16px, 1.4vw, 18px);
-        background: linear-gradient(to right, #180542, #14041e);
+        background: rgb(10, 20, 40);
         padding: 8px 10px;
         border-radius: 8px;
         cursor: pointer;
@@ -424,11 +424,16 @@ h2 {
 
     & p {
       font-size: 14px;
-      font-weight: 100;
+      font-weight: 400;
+      text-align: center;
+      color:white;
     }
 
     & button {
-      min-width: 150px;
+      min-width: 200px;
+      width: auto;
+      padding: 4px 20px;
+      height: auto;
     }
 
     & h2 {

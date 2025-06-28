@@ -2,7 +2,7 @@
   padding:20px clamp(4px, 5vw, 100px);
   display: grid;
   grid-template-columns:  300px auto 300px;
-  grid-template-rows: 60px auto auto;
+  grid-template-rows: 100px auto auto;
   max-width: 2000px;
   margin: auto;
 
@@ -16,6 +16,9 @@
       flex-direction: column;
       gap: 4px;
       width: auto;
+      & :last-child{
+        font-weight: 100;
+      }
     }
 
   }

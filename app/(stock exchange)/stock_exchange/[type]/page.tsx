@@ -27,8 +27,8 @@ export default function Page({params}: Trader) {
                         className={"user-header-img"}
                     />
                     <div className={"header-block"}>
-                        <span>{data.name}</span>
                         <span>{data.shortName}</span>
+                        <span>{data.name}</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Current price</span>

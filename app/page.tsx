@@ -119,8 +119,8 @@ export default function Page() {
                             {stockSimulationData.map((e: IStockSimulationData) => {
                                 return (<div className={"stock-row"} key={e.name}>
                                     <span>{e.name}</span>
-                                    <span>€{e.price[stockSimNumber]}</span>
-                                    <span>{e.diffDollar[stockSimNumber]}</span>
+                                    <span>{e.price[stockSimNumber]} €</span>
+                                    <span>{e.diffDollar[stockSimNumber]} €</span>
                                     <span>{e.diffPercent[stockSimNumber]}%</span>
                                     <span className={e.grow[stockSimNumber] ? "isGrow" : ""}><FontAwesomeIcon
                                         icon={faPlay}/></span>
@@ -227,9 +227,9 @@ export default function Page() {
                     </div>
                     <div className={"media"}>
                         <h5>Social media</h5>
-                        <a>Github</a>
-                        <a>Instagram</a>
-                        <a>Telegram</a>
+                        <a href = "https://github.com/2ADA2/rippler">Github</a>
+                        <a href = "https://www.instagram.com/_atem4ik2/">Instagram</a>
+                        <a href = "https://t.me/ARTEMKAddd">Telegram</a>
                     </div>
                     <div className={"rippler"}>
                         <h5>Rippler</h5>
