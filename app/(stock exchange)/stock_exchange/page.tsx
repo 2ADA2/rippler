@@ -19,13 +19,13 @@ export default function Page() {
         filter.has(filterName) ? newFilter.delete(filterName) : newFilter.add(filterName)
         setFilter(newFilter)
 
-        if(!newFilter.size) {
+        if (!newFilter.size) {
             setSortedPositions(positions)
             return
         }
         setSortedPositions(positions.filter(position => {
             for (let i of newFilter) {
-                if(!position.categories.includes(i)) {
+                if (!position.categories.includes(i)) {
                     return false;
                 }
             }
@@ -54,32 +54,41 @@ export default function Page() {
                     <Filter value={"high-price"} filter={filter} callback={(val: string) => updateFilter(val)}/>
                 </Box>
             </Container>
-            <Container>
+            <Container maxWidth={"xl"}>
                 {
                     sortedPositions.length === 0 && <div>no such positions</div>
                 }
                 {sortedPositions.length > 0 &&
-                    <Swiper spaceBetween={20}
-                            slidesPerView={2.25}
-                            className={"catalogue-container"}
+                    <Swiper
+                        spaceBetween={20}
+                        slidesPerView="auto"
+                        className={"catalogue-container"}
                     >
                         {sortedPositions.slice(0, 5).map((position, id) => (
-                            <SwiperSlide key={id}>
-                                <SECard name={position.name} description={position.description}
-                                        categories={position.categories}/>
+                            <SwiperSlide key={id} style={{width: "500px"}}>
+                                <SECard
+                                    name={position.name}
+                                    description={position.description}
+                                    categories={position.categories}
+                                />
                             </SwiperSlide>
                         ))}
                     </Swiper>
                 }
                 {sortedPositions.length > 5 &&
-                    <Swiper spaceBetween={20}
-                            slidesPerView={2.25}
-                            className={"catalogue-container"}
+                    <Swiper
+                        spaceBetween={20}
+                        slidesPerView="auto"
+                        className={"catalogue-container"
+                        }
                     >
                         {sortedPositions.slice(5, 9).map((position, id) => (
-                            <SwiperSlide key={id}>
-                                <SECard name={position.name} description={position.description}
-                                        categories={position.categories}/>
+                            <SwiperSlide key={id} style={{width: "500px"}}>
+                                <SECard
+                                    name={position.name}
+                                    description={position.description}
+                                    categories={position.categories}
+                                />
                             </SwiperSlide>
                         ))}
                     </Swiper>

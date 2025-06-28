@@ -4,15 +4,15 @@ import {Children} from "@/utils/models";
 import StoreProvider from "@/app/StoreProvider";
 import {Header} from "@/components/Header";
 import {NextFont} from "next/dist/compiled/@next/font";
-import { Inter } from 'next/font/google';
+import {Inter} from 'next/font/google';
+import {LayoutProvider} from "@/app/layoutProvider";
 
 
-const inter:NextFont= Inter({
+const inter: NextFont = Inter({
     subsets: ['latin'],
-    weight: ['100', '400', '600'],
+    weight: ['100', '400', '900'],
     variable: '--font-inter',
 });
-
 
 export default async function Layout({children}: Children) {
 
@@ -21,7 +21,7 @@ export default async function Layout({children}: Children) {
         <body>
         <StoreProvider>
             <Header></Header>
-            {children}
+            <LayoutProvider>{children}</LayoutProvider>
         </StoreProvider>
 
         </body>

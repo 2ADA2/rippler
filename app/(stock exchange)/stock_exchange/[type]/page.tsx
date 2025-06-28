@@ -1,26 +1,49 @@
 "use client"
 
 import "./trader.scss"
-import {Box, Container} from "@mui/system";
-import Image from "next/image";
-import RIPPLERIMG from "@/public/ripplerico.svg";
-import React, {useState} from "react";
-import {traderData} from "@/utils/testData";
-import {FormControl, InputAdornment, InputLabel, OutlinedInput} from "@mui/material";
+import {Box, Container, flex} from "@mui/system";
+import Image, {StaticImageData} from "next/image";
+import React, {useEffect, useState} from "react";
+import {testWallet, traderData} from "@/utils/testData";
+import {buyTheme, sellTheme} from "@/lib/theme/theme";
+import {InputForm} from "@/components/forCharts/inputForm";
+import {useParams} from "next/navigation";
+import {IMAGES} from "@/utils/images";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {sortWallet} from "@/functions/sortWallet";
+import {NAMES} from "@/utils/names";
+import {CurrencyInterface} from "@/lib/globalInterfaces";
+import {Card, Typography} from "@mui/material";
+import Link from "next/link"
 
-interface Trader {
-    params: { type: string }
-}
-
-export default function Page({params}: Trader) {
+export default function Page() {
     const [data, setData] = useState(traderData);
+    const params: { type: string } = useParams()
+    const image: StaticImageData | string = IMAGES[params.type];
+    const name: string = NAMES[params.type];
+    const [wallet, setWallet] = useState<CurrencyInterface[] | []>([]);
+    const [capital, setCapital] = useState("0");
+
+    const [current, setCurrent] = useState<CurrencyInterface>();
+
+    useEffect(() => {
+        const sorted = sortWallet(testWallet, name);
+        setWallet(sorted);
+        setCurrent(sorted[1]);
+
+        const capital = sorted.reduce((s, i) => {
+            return s + (i.count * i.coefficient);
+        }, 0);
+        setCapital(capital.toLocaleString());
+    }, []);
+
     return (
         <>
             <section className={"trade-container"}>
                 <Box className={"trade-header"}
                      sx={{display: "grid", alignItems: "center", gridTemplateColumns: " 60px repeat(5, 1fr)"}}>
                     <Image
-                        src={RIPPLERIMG}
+                        src={image}
                         width={"50"}
                         height={"50"}
                         alt="Rippler logo"
@@ -32,19 +55,19 @@ export default function Page({params}: Trader) {
                     </div>
                     <div className={"header-block"}>
                         <span>Current price</span>
-                        <span>{data.price} €</span>
+                        <span style={{ color:"#b9f6ca"}}>{data.price.toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Max in 24h </span>
-                        <span>{data.lastMax} €</span>
+                        <span style={{ color:"#f50057"}}>{data.lastMax.toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Min in 24h</span>
-                        <span>{data.lastMin} €</span>
+                        <span style={{ color:"#81d4fa"}}>{data.lastMin.toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Sales volume</span>
-                        <span>{data.salesVol} €</span>
+                        <span style={{ color:"#d4e157"}}>{data.salesVol.toLocaleString()} €</span>
                     </div>
                 </Box>
 
@@ -53,7 +76,7 @@ export default function Page({params}: Trader) {
                 </Container>
 
                 <Container className={"history"}>
-                <Box className={"purchases"}>purchases</Box>
+                    <Box className={"purchases"}>purchases</Box>
                     <Box className={"sales"}>sales</Box>
                 </Container>
 
@@ -62,39 +85,90 @@ export default function Page({params}: Trader) {
                 </Container>
 
                 <Container className={"finance-control"}>
-                    <div className={"finance-control-header"}>header</div>
-                    <Box className={"buy"}>
-                        <FormControl fullWidth sx={{ m: 1 }}>
-                            <InputLabel htmlFor="outlined-adornment-amount">{"Buy "+ data.shortName}</InputLabel>
-                            <OutlinedInput
-                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"buy "+ data.shortName}
-                            />
-                            <OutlinedInput
-                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"buy "+ data.shortName}
-                            />
-                        </FormControl>
+                    <div className={"finance-control-header mt-2 overflow-hidden"}>
+                        <div className={"pb-4 flex items-center gap-2 "}>
+                            <Link href={"/finance"}>Your wallet</Link>
+                            <span style={{fontSize:16, fontWeight:100}}>All capital <span style={{ color:"#b9f6ca"}}>{capital} €</span></span>
+                        </div>
+                        {(wallet.length > 1) && <Swiper slidesPerView={"auto"} spaceBetween={10}>
+                            {
+                                wallet.map((e, i) => {
+                                    return (
+                                        <SwiperSlide style={{width: "auto"}}>
+                                            <Card sx={{display: "flex", p: 2, backgroundColor:(i<=1) ? "#263238": ""}}>
+                                                <Box sx={{width: "50px", mr:1}}>
+                                                    {e.shortName}
+                                                </Box>
+                                                <Box sx={{
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "center",
+
+                                                }}>
+                                                    <Typography textAlign={"start"} sx={{width:"100%"}}>{e.count.toLocaleString()} {e.shortName}</Typography>
+                                                    <Typography textAlign={"start"} sx={{width:"100%", fontWeight:100, fontSize:16}}>{(e.count * e.coefficient).toLocaleString()} €</Typography>
+                                                </Box>
+                                            </Card>
+                                        </SwiperSlide>
+                                    )
+                                })
+                            }
+                            {
+                                !wallet.length && <Card sx={{width:150, height:50, p:2}}></Card>
+                            }
+                        </Swiper>}
+                    </div>
+                    <Box className={"buy mt-4"}>
+                        <h5>Buy {data.shortName}</h5>
+                        <InputForm
+                            data={data}
+                            theme={buyTheme}
+                            currency="€"
+                            value={100}
+                            label={"Buy " + data.shortName + " for"}
+                        />
+                        <InputForm
+                            data={data}
+                            theme={buyTheme}
+                            currency={
+                                <Image
+                                    src={image}
+                                    width={30}
+                                    height={30}
+                                    alt={"rippler logo"}
+                                />
+                            }
+                            value={100}
+                            label={"Buy " + data.shortName}
+                        />
                     </Box>
-                    <Box className={"sale"}>
-                        <FormControl fullWidth sx={{ m: 1 }}>
-                            <InputLabel htmlFor="outlined-adornment-amount">{"Sell "+ data.shortName}</InputLabel>
-                            <OutlinedInput
-                                value={100}
-                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"sell "+ data.shortName}
-                            />
-                            <OutlinedInput
-                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"buy "+ data.shortName}
-                            />
-                        </FormControl>
+
+                    <Box className={"sale mt-4"}>
+                        <h5>Sale {data.shortName}</h5>
+                        <InputForm
+                            data={data}
+                            theme={sellTheme}
+                            currency="€"
+                            value={100}
+                            label={"Sell " + data.shortName + " for"}
+                        />
+                        <InputForm
+                            data={data}
+                            theme={sellTheme}
+                            currency={
+                                <Image
+                                    src={image}
+                                    width={30}
+                                    height={30}
+                                    alt={"rippler logo"}
+                                />
+                            }
+                            value={100}
+                            label={"Sell " + data.shortName}
+                        />
                     </Box>
                 </Container>
             </section>
-            <Container>
-
-            </Container>
         </>
     )
 }
