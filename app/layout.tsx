@@ -5,6 +5,8 @@ import StoreProvider from "@/app/StoreProvider";
 import {Header} from "@/components/Header";
 import {NextFont} from "next/dist/compiled/@next/font";
 import { Inter } from 'next/font/google';
+import {ThemeProvider} from "@mui/material";
+import {mainTheme} from "@/lib/theme/theme";
 
 
 const inter:NextFont= Inter({
@@ -20,8 +22,10 @@ export default async function Layout({children}: Children) {
         <html lang="en" className={inter.className}>
         <body>
         <StoreProvider>
-            <Header></Header>
-            {children}
+            <ThemeProvider theme={mainTheme}>
+                <Header></Header>
+                {children}
+            </ThemeProvider>
         </StoreProvider>
 
         </body>

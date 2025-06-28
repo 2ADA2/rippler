@@ -8,11 +8,7 @@ import React, {useState} from "react";
 import {traderData} from "@/utils/testData";
 import {FormControl, InputAdornment, InputLabel, OutlinedInput} from "@mui/material";
 
-interface Trader {
-    params: { type: string }
-}
-
-export default function Page({params}: Trader) {
+export default function Page() {
     const [data, setData] = useState(traderData);
     return (
         <>
@@ -64,19 +60,15 @@ export default function Page({params}: Trader) {
                 <Container className={"finance-control"}>
                     <div className={"finance-control-header"}>header</div>
                     <Box className={"buy"}>
-                        <FormControl fullWidth sx={{ m: 1 }}>
+                        <h5>Buy {data.shortName}</h5>
+                        <FormControl fullWidth sx={{ m: 1,}}>
                             <InputLabel htmlFor="outlined-adornment-amount">{"Buy "+ data.shortName}</InputLabel>
                             <OutlinedInput
-                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"buy "+ data.shortName}
-                            />
-                            <OutlinedInput
+                                sx={{paddingRight: "10px", height: "50px", borderColor:"white"}}
                                 startAdornment={<InputAdornment position="start">€</InputAdornment>}
                                 label={"buy "+ data.shortName}
                             />
                         </FormControl>
-                    </Box>
-                    <Box className={"sale"}>
                         <FormControl fullWidth sx={{ m: 1 }}>
                             <InputLabel htmlFor="outlined-adornment-amount">{"Sell "+ data.shortName}</InputLabel>
                             <OutlinedInput
@@ -84,9 +76,24 @@ export default function Page({params}: Trader) {
                                 startAdornment={<InputAdornment position="start">€</InputAdornment>}
                                 label={"sell "+ data.shortName}
                             />
+                        </FormControl>
+                    </Box>
+                    <Box className={"sale"}>
+                        <h5>sale {data.shortName}</h5>
+                        <FormControl fullWidth sx={{m: 1}}>
+                            <InputLabel htmlFor="outlined-adornment-amount">{"Sell " + data.shortName}</InputLabel>
                             <OutlinedInput
+                                value={100}
                                 startAdornment={<InputAdornment position="start">€</InputAdornment>}
-                                label={"buy "+ data.shortName}
+                                label={"sell " + data.shortName}
+                            />
+                        </FormControl>
+                        <FormControl fullWidth sx={{m: 1}}>
+                            <InputLabel htmlFor="outlined-adornment-amount">{"Sell " + data.shortName}</InputLabel>
+                            <OutlinedInput
+                                value={100}
+                                startAdornment={<InputAdornment position="start">€</InputAdornment>}
+                                label={"sell " + data.shortName}
                             />
                         </FormControl>
                     </Box>
