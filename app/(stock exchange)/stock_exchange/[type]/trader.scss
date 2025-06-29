@@ -1,63 +1,129 @@
-.trade-container{
-  padding:20px clamp(4px, 5vw, 100px);
+.trade-container {
+  padding: 20px;
   display: grid;
-  grid-template-columns:  300px auto 300px;
-  grid-template-rows: 100px auto auto;
+  grid-template-columns:  400px auto 400px;
+  grid-template-rows: 60px auto auto;
   max-width: 2000px;
   margin: auto;
+  gap:4px;
 
-  & .trade-header{
-    border:1px solid white;
+  & .trade-header {
+    background: #181a20;
+    border-radius: 10px;
     grid-column: 1/3;
     padding: 0 40px;
+    line-height: 20px;
 
-    & .header-block{
+    & .header-block {
       display: flex;
       flex-direction: column;
       gap: 4px;
       width: auto;
-      & :last-child{
+      font-size: 16px;
+
+      & :last-child {
         font-weight: 100;
       }
     }
 
   }
 
-  & .chart-container{
-    border:1px solid white;
+  & .chart-container {
+    background: #181a20;
+    border-radius: 10px;
     grid-column: 2/3;
     grid-row: 2/3;
     min-height: 400px;
   }
 
-  .history{
+  .history {
     grid-column: 3/4;
     grid-row: 1/4;
-    border: 1px solid white;
+    background: #181a20;
+    border-radius: 10px;
   }
 
-  .orders{
+  .orders {
     grid-row: 2/4;
-    border: 1px solid white;
+    background: #181a20;
+    border-radius: 10px;
   }
 
-  .finance-control{
+  .finance-control {
     min-height: 300px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     grid-gap: 20px;
-    border: 1px solid white;
+    background: #181a20;
+    border-radius: 10px;
 
-    & .finance-control-header{
+    & .finance-control-header {
       grid-column: 1/3;
+      position: relative;
     }
+
   }
 
-  & .buy, & .sale{
-    padding: 0 clamp(0px, 1.5vw, 40px);
-    & h5{
-      margin:0 0 10px 8px;
+  & .buy, & .sale {
+    padding: 40px clamp(0px, 1.5vw, 40px);
+
+    & h5 {
+      margin: 0 0 10px 8px;
     }
+  }
+}
+
+.operation-confirmation {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  grid-column: 1/4;
+  background: #212121;
+  padding: 40px;
+
+  & h5 {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  & .confirmation-block {
+    display: grid;
+    grid-template-columns: 300px auto;
+    margin: 0;
+    margin-top: 10px;
+    width: 70%;
+    font-weight: 100;
+    gap: 20px;
+
+    & :first-child {
+      text-align: end;
+    }
+  }
+}
+
+.approve-btn {
+  width: 200px;
+  height: 50px;
+  margin-left: 8px;
+}
+
+.user-error {
+  position: absolute;
+  bottom: -44px;
+  padding: 4px 40px;
+  border-radius: 4px;
+  animation: show-error 1s;
+  color:#f8bbd0;
+  font-size: 20px;
+  font-weight: 100;
+}
+
+@keyframes show-error {
+  0% {
+    background: #c2185b;
+  }
+  100% {
+    background: rgba(194, 24, 91, 0);
   }
 }

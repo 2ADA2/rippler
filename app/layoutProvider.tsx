@@ -10,6 +10,10 @@ const darkTheme = createTheme({
     },
     palette: {
         mode: 'dark',
+        background: {
+            default: '#000000', // ЧЁРНЫЙ ФОН ВСЕГО ТЕЛА
+            paper: '#111111',   // ФОН КАРТОЧЕК И ДИАЛОГОВ
+        },
     },
     components: {
         MuiOutlinedInput: {

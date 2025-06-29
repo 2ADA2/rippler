@@ -1,5 +1,5 @@
 import RIPPLERICO from "@/public/ripplerico.svg"
-import BITCOINICO from "@/public/images/bigcom.jpg"
+import BITCOINICO from "@/public/images/bitcoin.png"
 import ETHERIUMICO from "@/public/images/etherium.png"
 import LITECOINICO from "@/public/images/litecoin.png"
 import {StaticImageData} from "next/image";
