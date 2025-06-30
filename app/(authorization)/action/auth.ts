@@ -1,40 +1,36 @@
-import {FormState, SignInFormSchema, SignupFormSchema} from "@/app/_lib/definitions";
 import axios from "axios";
 import {API_URL} from "@/utils/env";
 import {redirect} from "next/navigation";
-import {useAppDispatch} from "@/lib/hooks";
+import {getUserData} from "@/functions/getUserData";
+import {setCookie} from "typescript-cookie";
 
-export async function signup(state: FormState, formData: FormData) {
+
+export async function signup(e:React.MouseEvent<HTMLButtonElement>, username:string, password:string):Promise<string|null> {
+    e.preventDefault();
     const url:string = API_URL
-    const validatedFields = SignupFormSchema.safeParse({
-        name: formData.get('name'),
-        email: formData.get('email'),
-        password: formData.get('password'),
-    })
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-        }
-    }
 
-    const dispatch = useAppDispatch()
+    const res = await axios.post(url+"/register", {username, password})
+
+    if (res.status === 200) {
+        redirect("/login");
+        return null
+    }
+    return res.data.error
 }
 
-export async function signin(state: FormState, formData: FormData) {
+export async function signin(e:React.MouseEvent<HTMLButtonElement>,username:string, password:string, callback:() => void) {
+    e.preventDefault();
     const url:string = API_URL
-    const validatedFields = SignInFormSchema.safeParse({
-        email: formData.get('email'),
-        password: formData.get('password'),
-    })
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-        }
-    }
 
-    axios.post(url+"/login", formData).then((res) => {
-        if (res.data.token) {
+    const res = await axios.post(url+"/login", {username, password})
+
+    if (res.data.token) {
+        getUserData(res.data.token).then(async function (data)  {
+            setCookie("token", res.data.token);
+            callback()
             redirect("/dashboard")
-        }
-    })
+            return null
+        })
+    }
+    return res.data.error
 }

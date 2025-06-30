@@ -1,51 +1,51 @@
 "use client"
 import Link from "next/link";
-import {useActionState, useRef} from "react";
+import {useState} from "react";
 import {signin} from "@/app/(authorization)/action/auth";
-import {useAppDispatch, useAppSelector} from "@/lib/hooks";
-import {loginUser} from "@/lib/features/user/auth";
+import {useDispatch} from "react-redux";
+import {setIsLoggedIn} from "@/lib/features/user/UserSlice";
+
 
 export default function Page() {
-    const dispatch = useAppDispatch();
-    const [state, action, pending] = useActionState(signin, undefined)
+    const [error, setError] = useState<string|null>();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
-    const login = () => {
-        if(!state?.errors){
-            dispatch(loginUser)
-        }
+    const dispatch = useDispatch();
+
+    function callback(){
+        console.log(1)
+        dispatch(setIsLoggedIn({isLoggedIn: true}));
     }
+
     return (
         <>
-            <form action={action}>
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input id="email" name="email" placeholder="Email"/>
+            <form className={"auth-form"}>
+                <h5>Rippler login</h5>
+                <div className={"input-form"}>
+                    <label htmlFor="text">Username</label>
+                    <input type="" name="username" placeholder="username"
+                           onChange={(e) => setUsername(e.target.value)}/>
                 </div>
 
-                <div>
+                <div className={"input-form"}>
                     <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password"/>
+                    <input id="password" name="password" type="password" onChange={(e) => setPassword(e.target.value)}/>
                 </div>
-                <button disabled={pending} type="submit" onClick={login}>
-                    Sign In
-                </button>
+                <div className={"input-form"}>
+                    <div/>
+                    <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => signin(e, username, password,() =>callback())}>
+                        Sign In
+                    </button>
+                </div>
+
+                <div className="errors auth-under">
+                    {error && <p>{error}</p>}
+                </div>
+                <div className={"auth-under"}>
+                    Don't you have an account? <Link href="/registration">sign up there</Link> !
+                </div>
             </form>
-            <div className="errors">
-                {state?.errors?.email && <p>{state.errors.email || "email error"}</p>}
-                {state?.errors?.password && (
-                    <div>
-                        <p>Password must:</p>
-                        <ul>
-                            {state.errors.password.map((error) => (
-                                <li key={error}>- {error}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-            <div>
-                Don't you have an account? <Link href="/registration">sign up there</Link> !
-            </div>
         </>
 
     );

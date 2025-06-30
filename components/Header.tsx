@@ -1,31 +1,24 @@
 "use client"
 import Link from "next/link";
-import React, {useEffect} from "react";
-import {useAppDispatch, useAppSelector} from "@/lib/hooks";
-import {authorizeUser} from "@/lib/features/user/auth";
-import {logoutUser} from "@/lib/features/user/logout";
-import {userSlice} from "@/lib/features/user/UserSlice";
-import {getCookie} from "typescript-cookie";
+import {useAppSelector} from "@/lib/hooks";
 import Image from "next/image";
 import RIPPLERIMG from "../public/ripplerico.svg"
-import {Tab, Tabs} from "@mui/material";
+import {useEffect, useState} from "react";
 
 
 export const Header = () => {
-    const dispatch = useAppDispatch();
-    const {setToken} = userSlice.actions
-    const {isLoggedIn, euro, rippler} = useAppSelector(state => state.userReducer)
+    const {isLoggedIn, user} = useAppSelector(state => state.userReducer)
+    const [euro, setEuro] = useState(0);
+    const [rippler, setRippler] = useState(0);
 
     useEffect(() => {
-        const token = getCookie("token");
-        dispatch(setToken({token}))
-        dispatch(authorizeUser).then(res => {
-        })
-    }, []);
+        console.log(user)
+        if("username" in user){
+            setEuro(user.wallet.wallet[0].count)
+            setRippler(user.wallet.wallet[1].count)
+        }
+    }, [user]);
 
-    const logout = () => {
-        dispatch(logoutUser)
-    }
     return (
         <header className="flex justify-between items-center gap-3">
             <Link href={"/"} className={"rippler flex gap-2"}>
@@ -49,7 +42,7 @@ export const Header = () => {
                 {isLoggedIn && <>
                     <Link href={"/dashboard"}>ada</Link>
                     <Link href={"/wallet"}>{euro} €</Link>
-                    <Link href ={"/donate"}>0 R</Link>
+                    <Link href ={"/donate"}>{rippler} R</Link>
                     <a className={"user-header-img"}>
                         <Image
                             src={RIPPLERIMG}
@@ -60,7 +53,7 @@ export const Header = () => {
                         />
                     </a>
                 </>}
-                <>
+                {!isLoggedIn && <>
                     <Link href="/login">login</Link>
                     <Link href="/login">{euro} €</Link>
                     <Link href="/login">{rippler} R</Link>
@@ -73,7 +66,7 @@ export const Header = () => {
                             className={"user-header-img"}
                         />
                     </a>
-                </>
+                </>}
             </div>
         </header>
     );

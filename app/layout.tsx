@@ -6,6 +6,8 @@ import {Header} from "@/components/Header";
 import {NextFont} from "next/dist/compiled/@next/font";
 import {Inter} from 'next/font/google';
 import {LayoutProvider} from "@/app/layoutProvider";
+import {useAppDispatch} from "@/lib/hooks";
+import {useDispatch} from "react-redux";
 
 
 const inter: NextFont = Inter({

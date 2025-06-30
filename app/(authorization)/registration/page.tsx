@@ -1,50 +1,43 @@
 "use client"
 import Link from "next/link";
 import {signup} from "@/app/(authorization)/action/auth";
-import {useActionState} from "react";
+import {useState} from "react";
 
 export default function Page() {
-    const [state, action, pending] = useActionState(signup, undefined)
+    const [error, setError] = useState<string | null>(null);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
 
     return (
         <>
-            <form action={action}>
-                <div>
-                    <label htmlFor="name">Name</label>
-                    <input id="name" name="name" placeholder="Name"/>
+            <form className={"auth-form"}>
+                <h5>Rippler registration</h5>
+                <div className={"input-form"}>
+                    <label >Username</label>
+                    <input type={"text"} placeholder="username" onChange={(e) => setUsername(e.target.value)} />
                 </div>
 
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input id="email" name="email" placeholder="Email"/>
-                </div>
-
-                <div>
+                <div className={"input-form"}>
                     <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password"/>
+                    <input id="password" name="password" type="password" onChange={(e) => setPassword(e.target.value)} />
                 </div>
-                <button disabled={pending} type="submit">
-                    Sign Up
-                </button>
-            </form>
-            <div className="errors">
+                <div className={"input-form"}>
+                    <div/>
+                    <button type="submit" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        signup(e, username, password).then((err: string | null) => setError(err))
+                    }}>
+                        Sign Up
+                    </button>
+                </div>
 
-                {state?.errors?.name && <p>{state.errors.name || "name error"}</p>}
-                {state?.errors?.email && <p>{state.errors.email || "email error"}</p>}
-                {state?.errors?.password && (
-                    <div>
-                        <p>Password must:</p>
-                        <ul>
-                            {state.errors.password.map((error) => (
-                                <li key={error}>- {error}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-            <div>
-                Do you have an account? <Link href="/login">sign in there</Link> !
-            </div>
+                <div className="errors auth-under">
+                    {error && <p>{error}</p>}
+                </div>
+                <div className={"auth-under"}>
+                    Do you already have an account? <Link href="/login">sign in there</Link> !
+                </div>
+            </form>
         </>
     )
         ;

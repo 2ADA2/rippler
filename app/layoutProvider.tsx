@@ -3,6 +3,13 @@ import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@mui/system";
 import {CssBaseline} from "@mui/material";
 import 'swiper/css';
+import {useAppDispatch} from "@/lib/hooks";
+import {useDispatch} from "react-redux";
+import {useEffect} from "react";
+import {getUserData} from "@/functions/getUserData";
+import {getCookie} from "typescript-cookie";
+import {GetUserDataInterface} from "@/lib/globalInterfaces";
+import {setIsLoggedIn, setUserData} from "@/lib/features/user/UserSlice";
 
 const darkTheme = createTheme({
     typography: {
@@ -41,7 +48,22 @@ const darkTheme = createTheme({
     },
 });
 
-export function LayoutProvider({ children }: { children: React.ReactNode }) {
+export function LayoutProvider({children}: { children: React.ReactNode }) {
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const token = getCookie("token")
+        if (token) {
+            getUserData(token)
+                .then((data: GetUserDataInterface) => {
+                    dispatch(setUserData({userData: data}))
+                }).then(() => {
+                dispatch(setIsLoggedIn({isLoggedIn: true}));
+
+            })
+        }
+    }, []);
 
     return (
         <ThemeProvider theme={darkTheme}>

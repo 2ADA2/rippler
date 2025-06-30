@@ -5,3 +5,14 @@ export interface CurrencyInterface {
     coefficient: number;
     code:number,
 }
+
+export interface GetUserDataInterface {
+    username: string;
+    imgUrl: string;
+    wallet:WalletInterface;
+}
+
+export interface WalletInterface {
+    username: string;
+    wallet:CurrencyInterface[]
+}

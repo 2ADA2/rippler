@@ -1,0 +1,36 @@
+.auth-form{
+  background:#181a20;
+  width: 500px;
+  margin:auto;
+  padding:20px;
+  border-radius:10px;
+
+  & h5{
+    text-align:center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+
+  & .input-form{
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    text-align: end;
+    gap:20px;
+    margin-bottom: 20px;
+  }
+
+  & input{
+    border:1px solid #ccc;
+    padding-left: 4px;
+  }
+
+  & button{
+    width: 150px;
+    height: 40px;
+  }
+
+  & .auth-under{
+    font-weight: 100;
+  }
+}
