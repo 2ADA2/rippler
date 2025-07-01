@@ -43,7 +43,6 @@ export default function Page() {
         const interval = setInterval(() => {
             setStockSimNumber(current)
             current = current + 1
-            console.log(current)
             if (current > 4) current = 0
         }, 1000)
         return () => clearInterval(interval)

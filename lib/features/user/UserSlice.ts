@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {removeCookie, setCookie} from "typescript-cookie";
-import {GetUserDataInterface} from "@/lib/globalInterfaces";
+import {CurrencyInterface, GetUserDataInterface} from "@/lib/globalInterfaces";
 
 export interface UserData {
     isLoading: boolean
@@ -37,7 +37,16 @@ export const userSlice = createSlice({
             state.isLoggedIn = action.payload.isLoggedIn
         },
         setUserData(state:UserData, action: { payload: { userData: GetUserDataInterface } }) {
-            state.user = action.payload.userData
+            let userdata:GetUserDataInterface = action.payload.userData
+            let wallet:CurrencyInterface[] = userdata.wallet.wallet
+
+            wallet.map(e => {
+                e.count = Math.floor(e.count*100)/100
+                return e
+            })
+
+            userdata.wallet.wallet = wallet
+            state.user = userdata
         }
     }
 })

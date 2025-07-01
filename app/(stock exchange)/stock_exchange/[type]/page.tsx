@@ -3,7 +3,7 @@
 import "./trader.scss"
 import {Box, Container, flex} from "@mui/system";
 import Image, {StaticImageData} from "next/image";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {testWallet, traderData} from "@/utils/testData";
 import {buyTheme, sellTheme} from "@/lib/theme/theme";
 import {InputForm} from "@/components/forCharts/inputForm";
@@ -12,11 +12,18 @@ import {IMAGES} from "@/utils/images";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {sortWallet} from "@/functions/sortWallet";
 import {NAMES} from "@/utils/names";
-import {CurrencyInterface} from "@/lib/globalInterfaces";
+import {CurrencyInterface, StockHistoryInterface, StockInterface, StockOneInterface} from "@/lib/globalInterfaces";
 import {Button, Card, Typography} from "@mui/material";
 import Link from "next/link"
+import {useAppSelector} from "@/lib/hooks";
+import {SChart} from "@/components/charts/standard";
+import {MainChart} from "@/components/charts/main";
 
 export default function Page() {
+    const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
+    const {user} = useAppSelector(state => state.userReducer)
+
+    const [formattedData, setFormattedData] = useState<StockOneInterface[] | []>([]);
     const [data, setData] = useState(traderData);
     const params: { type: string } = useParams()
     const image: StaticImageData | string = IMAGES[params.type];
@@ -25,6 +32,11 @@ export default function Page() {
     const [capital, setCapital] = useState("0");
 
     const [current, setCurrent] = useState<CurrencyInterface>();
+
+    const [price, setPrice] = useState(0);
+    const [minDay, setMinDay] = useState(0);
+    const [maxDay, setMaxDay] = useState(0);
+
 
     const [buyEuro, setBuyEuro] = useState(0);
     const [buyCurrency, setBuyCurrency] = useState(0);
@@ -39,7 +51,6 @@ export default function Page() {
 
     const [userError, setUserError] = useState<string|null>();
 
-
     useEffect(() => {
         const sorted = sortWallet(testWallet, name);
         setWallet(sorted);
@@ -50,6 +61,33 @@ export default function Page() {
         }, 0);
         setCapital(capital.toLocaleString());
     }, []);
+
+    useEffect(() => {
+        if(data.name in stockData){
+            let formatted = (stockCurrentData as StockInterface)[data.name]
+            formatted = {...formatted, time: formatted.time.split(".").reverse().join("-")}
+
+            const stockExchangeData = (stockData as StockHistoryInterface)[data.name]
+            const lastDay = stockExchangeData.at(-2)
+
+            setPrice(formatted.close)
+            if(lastDay){
+                setMinDay(lastDay.low)
+                setMaxDay(lastDay.high)
+            }
+        }
+    }, [stockCurrentData]);
+
+    useEffect(() => {
+        if(data.name in stockData){
+            const stockExchangeData = (stockData as StockHistoryInterface)[data.name]
+            const formatted = stockExchangeData.map(e => {
+                e = {...e, time: e.time.split(".").reverse().join("-")}
+                return e
+            })
+            setFormattedData(formatted)
+        }
+    }, [stockData]);
 
     function buyCurrencyHandler(val: number) {
         setBuyCurrency(val)
@@ -121,15 +159,15 @@ export default function Page() {
                     </div>
                     <div className={"header-block"}>
                         <span>Current price</span>
-                        <span style={{color: "#b9f6ca"}}>{data.price.toLocaleString()} €</span>
+                        <span style={{color: "#b9f6ca"}}>{Number(price.toFixed(2)).toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Max in 24h </span>
-                        <span style={{color: "#f50057"}}>{data.lastMax.toLocaleString()} €</span>
+                        <span style={{color: "#f50057"}}>{Number(maxDay.toFixed(2)).toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Min in 24h</span>
-                        <span style={{color: "#81d4fa"}}>{data.lastMin.toLocaleString()} €</span>
+                        <span style={{color: "#81d4fa"}}>{Number(minDay.toFixed(2)).toLocaleString()} €</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Sales volume</span>
@@ -137,12 +175,12 @@ export default function Page() {
                     </div>
                     <div className={"header-block items-center flex-col items-center flex justify-center"} style={{background: "#263238", height:60}}>
                         <span style={{color: "#cfd8dc"}}>1 {data.shortName}</span>
-                        <span style={{color: "#80cbc4", fontWeight: 500}}>{current?.coefficient} €</span>
+                        <span style={{color: "#80cbc4", fontWeight: 500}}>{Number(price.toFixed(2)).toLocaleString()} €</span>
                     </div>
                 </Box>
 
                 <Container className="chart-container">
-                    chart
+                    <MainChart data={formattedData}/>
                 </Container>
 
                 <Container className={"history"}>

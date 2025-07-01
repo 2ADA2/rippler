@@ -1,12 +1,23 @@
 'use client';
 
-import {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {createChart, CandlestickSeries, CandlestickData} from 'lightweight-charts';
 import {testChartData} from "@/utils/testData";
 import {ChartData} from "@/utils/models";
+import {useAppSelector} from "@/lib/hooks";
+import {StockHistoryInterface, StockInterface} from "@/lib/globalInterfaces";
 
-export const SChart: React.FC<ChartData> = ({data}) => {
+export const MainChart: React.FC<ChartData> = React.memo(({data}:ChartData) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const {stockCurrentData} = useAppSelector(state => state.stockReducer)
+    const [lastData, setLastData] = useState();
+
+    useEffect(() => {
+        if("Rippler" in stockCurrentData){
+            console.log(stockCurrentData["Rippler"])
+        }
+
+    }, [stockCurrentData]);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -36,8 +47,7 @@ export const SChart: React.FC<ChartData> = ({data}) => {
             wickDownColor: '#ef5350',
         });
 
-        candlestickSeries.setData(testChartData);
-        chart.timeScale().scrollToRealTime();
+        candlestickSeries.setData(data);
 
 
 
@@ -78,7 +88,7 @@ export const SChart: React.FC<ChartData> = ({data}) => {
             chart.remove();
         };
 
-    }, []);
+    }, [data]);
 
     return <div ref={containerRef} className={"chart"}/>;
-}
+});

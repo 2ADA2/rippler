@@ -3,13 +3,18 @@ import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@mui/system";
 import {CssBaseline} from "@mui/material";
 import 'swiper/css';
-import {useAppDispatch} from "@/lib/hooks";
 import {useDispatch} from "react-redux";
 import {useEffect} from "react";
 import {getUserData} from "@/functions/getUserData";
 import {getCookie} from "typescript-cookie";
-import {GetUserDataInterface} from "@/lib/globalInterfaces";
+import {GetUserDataInterface, StockHistoryInterface, StockOneInterface} from "@/lib/globalInterfaces";
 import {setIsLoggedIn, setUserData} from "@/lib/features/user/UserSlice";
+import {io} from "socket.io-client";
+import {API_URL} from "@/utils/env";
+import {getStockData} from "@/functions/getStockData";
+import {updateStockData, updateStockHistoryData} from "@/lib/features/stock/stockSlice";
+
+const socket = io(API_URL);
 
 const darkTheme = createTheme({
     typography: {
@@ -18,8 +23,8 @@ const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         background: {
-            default: '#000000', // ЧЁРНЫЙ ФОН ВСЕГО ТЕЛА
-            paper: '#111111',   // ФОН КАРТОЧЕК И ДИАЛОГОВ
+            default: '#000000',
+            paper: '#111111',
         },
     },
     components: {
@@ -27,7 +32,7 @@ const darkTheme = createTheme({
             styleOverrides: {
                 root: {
                     '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#888', // или theme.palette.divider
+                        borderColor: '#888',
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#aaa',
@@ -49,7 +54,6 @@ const darkTheme = createTheme({
 });
 
 export function LayoutProvider({children}: { children: React.ReactNode }) {
-
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -63,6 +67,28 @@ export function LayoutProvider({children}: { children: React.ReactNode }) {
 
             })
         }
+        getStockData().then((data:StockHistoryInterface) => {
+            dispatch(updateStockHistoryData({data}))
+        })
+    }, []);
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            console.log('🟢 Connected:', socket.id);
+        });
+
+        socket.on('updateData', (data:StockOneInterface) => {
+            dispatch(updateStockData({data}))
+        });
+
+        const interval = setInterval(() => {
+            socket.emit("getData")
+        },1000)
+
+        return () => {
+            socket.disconnect();
+            clearInterval(interval)
+        };
     }, []);
 
     return (

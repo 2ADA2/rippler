@@ -12,7 +12,6 @@ export const Header = () => {
     const [rippler, setRippler] = useState(0);
 
     useEffect(() => {
-        console.log(user)
         if("username" in user){
             setEuro(user.wallet.wallet[0].count)
             setRippler(user.wallet.wallet[1].count)

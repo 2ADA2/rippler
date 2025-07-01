@@ -16,3 +16,18 @@ export interface WalletInterface {
     username: string;
     wallet:CurrencyInterface[]
 }
+
+export interface StockOneInterface {
+    time: string
+    high: number
+    low: number
+    open: number
+    close: number
+}
+
+export interface StockInterface {
+    [key: string]: StockOneInterface;
+}
+export interface StockHistoryInterface {
+    [key: string]: StockOneInterface[];
+}
