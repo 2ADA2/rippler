@@ -15,44 +15,6 @@ export const traderData = {
     salesVol: 20485,
 }
 
-export const testWallet: CurrencyInterface[] = [
-    {
-        name: "Euro",
-        shortName: "EUR",
-        count: 1000.00,
-        coefficient: 1,
-        code: 0,
-    },
-    {
-        name: "Rippler",
-        shortName: "RPL",
-        count: 0.0023,
-        coefficient: 10000,
-        code: 1,
-    },
-    {
-        name: "Innovate",
-        shortName: "INV",
-        count: 0.15,
-        coefficient: 23.5765,
-        code: 2,
-    },
-    {
-        name: "Kilowatt",
-        shortName: "KWT",
-        count: 0.0000,
-        coefficient: 154.46,
-        code: 3,
-    },
-    {
-        name: "ADA",
-        shortName: "ADA",
-        count: 125.9646,
-        coefficient: 1564.08,
-        code: 4,
-    }
-]
-
 export const popularPositions: FPEInterface[] = [
     {
         imgUrl: BTC,

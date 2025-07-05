@@ -11,11 +11,14 @@ import {IMAGES} from "@/utils/images";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {sortWallet} from "@/functions/sortWallet";
 import {NAMES} from "@/utils/names";
-import {CurrencyInterface} from "@/lib/globalInterfaces";
+import {CurrencyInterface, GetUserDataInterface, GetWalletInterface} from "@/lib/globalInterfaces";
 import {Card, Typography} from "@mui/material";
 import Link from "next/link"
 import {useAppSelector} from "@/lib/hooks";
 import {MainChart} from "@/components/charts/main";
+import {skeletonWallet} from "@/utils/skeletonData";
+import {createOperation} from "@/functions/createOperation";
+import {getCookie} from "typescript-cookie";
 
 export default function Page() {
     const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
@@ -41,16 +44,16 @@ export default function Page() {
     const [userError, setUserError] = useState<string | null>();
 
     useEffect(() => {
-        if(!user) return
-        if(!user.wallet.wallet) return;
-        const sorted = sortWallet(user.wallet.wallet, name);
-        setWallet(sorted);
-        setCurrent(sorted[1]);
+        if (!user) {
+            const sorted = sortWallet(skeletonWallet, name);
+            setWallet(sorted);
+            setCurrent(sorted[1]);
+        } else {
 
-        const capital = sorted.reduce((s, i) => {
-            return s + (i.count * i.coefficient);
-        }, 0);
-        setCapital(capital.toLocaleString());
+            const sorted = sortWallet(user.wallet.wallet, name);
+            setWallet(sorted);
+            setCurrent(sorted[1]);
+        }
     }, [user]);
 
     useEffect(() => {
@@ -62,16 +65,26 @@ export default function Page() {
                 setMinDay(lastDay.low)
                 setMaxDay(lastDay.high)
             }
+            const capital = wallet.reduce((s, i) => {
+                if (i.name === "Euro") return s + i.count;
+                return s + (i.count * stockCurrentData[i.name].close);
+
+            }, 0);
+            setCapital(capital.toLocaleString());
+
         }
+
     }, [stockCurrentData]);
 
     function buyCurrencyHandler(val: number) {
+        setUserError("")
         setBuyCurrency(val)
         const amount = Number((val * price).toFixed(5))
         setBuyEuro(amount)
     }
 
     function buyEuroHandler(val: number) {
+        setUserError("")
         setBuyEuro(val)
         const amount = Number((val / price).toFixed(5))
         setBuyCurrency(amount)
@@ -79,11 +92,13 @@ export default function Page() {
 
     function sellCurrencyHandler(val: number) {
         setSellCurrency(val)
+        setUserError("")
         const amount = Number((val * price).toFixed(5))
         setSellEuro(amount)
     }
 
     function sellEuroHandler(val: number) {
+        setUserError("")
         setSellEuro(val)
         const amount = Number((val / price).toFixed(5))
         setSellCurrency(amount)
@@ -91,18 +106,73 @@ export default function Page() {
 
 
     function approvePurchase() {
-        if(!buyCurrency) return;
-        setBuyEuro(0)
-        setBuyCurrency(0)
+        const token = getCookie("token")
+        if (buyCurrency && user && current && token) {
+            if (buyEuro > user.wallet.wallet[0].count) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("You don't have enough money.")
+                })
+                return
+            }
+            if (buyEuro < 1) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("your operations must be bigger than 1 EUR")
+                })
+                return
+            }
+            if (buyCurrency < 0.001) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("your operations must be bigger than 0.001 " + current.shortName)
+                })
+                return
+            }
+            setUserError("")
+            createOperation(token, "buy", buyCurrency, current.name).then((data) => {
+                console.log(data)
+            })
+            setBuyEuro(0)
+            setBuyCurrency(0)
+        }
     }
 
     function approveSell() {
-        if(!sellCurrency) return;
-        setSellCurrency(0)
-        setSellEuro(0)
+        const token = getCookie("token")
+        if (sellCurrency && user && current && token) {
+            if (sellEuro > user.wallet.wallet[0].count) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("You don't have enough money.")
+                })
+                return
+            }
+            if (sellEuro < 1) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("your operations must be bigger than 1 EUR")
+                })
+                return
+            }
+            if (sellCurrency < 0.001) {
+                setUserError("")
+                setTimeout(() => {
+                    setUserError("your operations must be bigger than 0.001 " + current.shortName)
+                })
+                return
+            }
+            createOperation(token, "sell", sellCurrency, current.name).then((data:GetWalletInterface) => {
+                let newUser:GetUserDataInterface = {...user}
+                newUser.wallet.wallet = data.wallet.wallet
+            })
+            setUserError("")
+            setSellEuro(0)
+            setSellCurrency(0)
+        }
     }
 
-    if(!current) return <></>
+    if (!current) return <></>
 
     return (
         <>
@@ -206,7 +276,7 @@ export default function Page() {
                                                         fontWeight: 100,
                                                         fontSize: 16
                                                     }}>
-                                                        {(e.count * e.coefficient).toLocaleString()} €
+                                                        {e.name === "Euro" ? e.count : stockCurrentData && (stockCurrentData[e.name].close * wallet[i].count).toLocaleString()} €
                                                     </Typography>
 
                                                 </Box>

@@ -58,7 +58,6 @@ const darkTheme = createTheme({
 
 export function LayoutProvider({children}: { children: React.ReactNode }) {
     const dispatch = useDispatch();
-    const {user} = useAppSelector(state => state.userReducer)
     const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -98,12 +97,12 @@ export function LayoutProvider({children}: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        if (user && stockData && stockCurrentData) {
+        if (stockData && stockCurrentData) {
             setIsLoaded(true);
         } else {
             setIsLoaded(false)
         }
-    }, [user, stockData, stockCurrentData]);
+    }, [stockData, stockCurrentData]);
 
     return (
         <ThemeProvider theme={darkTheme}>

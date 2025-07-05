@@ -76,8 +76,6 @@ export function InputForm({data, theme, currency, value, label, change}: Props) 
         if(!l.length){
             l = ["0"]
         }
-
-        console.log(l.join(""))
         setCount(l.join(""))
     }
 

@@ -3,7 +3,10 @@ import Link from "next/link";
 import {useState} from "react";
 import {signin} from "@/app/(authorization)/action/auth";
 import {useDispatch} from "react-redux";
-import {setIsLoggedIn} from "@/lib/features/user/UserSlice";
+import {setIsLoggedIn, setUserData} from "@/lib/features/user/UserSlice";
+import {getUserData} from "@/functions/getUserData";
+import {GetUserDataInterface} from "@/lib/globalInterfaces";
+import {getCookie} from "typescript-cookie";
 
 
 export default function Page() {
@@ -14,8 +17,16 @@ export default function Page() {
     const dispatch = useDispatch();
 
     function callback(){
-        console.log(1)
-        dispatch(setIsLoggedIn({isLoggedIn: true}));
+        const token = getCookie("token")
+        if(!token)return;
+
+        getUserData(token)
+            .then((data: GetUserDataInterface) => {
+                dispatch(setUserData({userData: data}))
+            }).then(() => {
+            dispatch(setIsLoggedIn({isLoggedIn: true}));
+
+        })
     }
 
     return (

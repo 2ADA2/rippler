@@ -8,18 +8,17 @@ import {Loading} from "@/components/loading";
 
 
 export const Header = () => {
-    const {isLoggedIn, user} = useAppSelector(state => state.userReducer)
+    const {user} = useAppSelector(state => state.userReducer)
     const [euro, setEuro] = useState(0);
     const [rippler, setRippler] = useState(0);
 
     useEffect(() => {
+        console.log(user)
         if(user){
             setEuro(user.wallet.wallet[0].count)
             setRippler(user.wallet.wallet[1].count)
         }
     }, [user]);
-
-    if(!user) return <></>;
 
     return (
         <header className="flex justify-between items-center gap-3">
@@ -41,7 +40,7 @@ export const Header = () => {
                 <Link href = {"/about"}>About</Link>
             </nav>
             <div className={"grid grid-cols-2 grid-rows-3 user-header-info"}>
-                {isLoggedIn && <>
+                {user && <>
                     <Link href={"/dashboard"}>{user.username}</Link>
                     <Link href={"/wallet"}>{euro} €</Link>
                     <Link href ={"/donate"}>{rippler} R</Link>
@@ -55,7 +54,7 @@ export const Header = () => {
                         />
                     </a>
                 </>}
-                {!isLoggedIn && <>
+                {!user && <>
                     <Link href="/login">login</Link>
                     <Link href="/login">{euro} €</Link>
                     <Link href="/login">{rippler} R</Link>

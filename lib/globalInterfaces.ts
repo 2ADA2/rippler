@@ -25,6 +25,12 @@ export interface StockOneInterface {
     close: number
 }
 
+export interface GetWalletInterface {
+    imgUrl:string,
+    username:string,
+    wallet:WalletInterface
+}
+
 export interface StockInterface {
     [key: string]: StockOneInterface;
 }
