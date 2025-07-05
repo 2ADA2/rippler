@@ -4,15 +4,18 @@ import {ThemeProvider} from "@mui/system";
 import {CssBaseline} from "@mui/material";
 import 'swiper/css';
 import {useDispatch} from "react-redux";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {getUserData} from "@/functions/getUserData";
 import {getCookie} from "typescript-cookie";
-import {GetUserDataInterface, StockHistoryInterface, StockOneInterface} from "@/lib/globalInterfaces";
+import {GetUserDataInterface, StockHistoryInterface, StockInterface, StockOneInterface} from "@/lib/globalInterfaces";
 import {setIsLoggedIn, setUserData} from "@/lib/features/user/UserSlice";
 import {io} from "socket.io-client";
 import {API_URL} from "@/utils/env";
 import {getStockData} from "@/functions/getStockData";
 import {updateStockData, updateStockHistoryData} from "@/lib/features/stock/stockSlice";
+import {assign} from "next/dist/shared/lib/router/utils/querystring";
+import {useAppSelector} from "@/lib/hooks";
+import {Loading} from "@/components/loading";
 
 const socket = io(API_URL);
 
@@ -55,6 +58,10 @@ const darkTheme = createTheme({
 
 export function LayoutProvider({children}: { children: React.ReactNode }) {
     const dispatch = useDispatch();
+    const {user} = useAppSelector(state => state.userReducer)
+    const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
+
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         const token = getCookie("token")
@@ -74,27 +81,34 @@ export function LayoutProvider({children}: { children: React.ReactNode }) {
 
     useEffect(() => {
         socket.on('connect', () => {
-            console.log('🟢 Connected:', socket.id);
+            console.log('Connected:', socket.id);
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected:', socket.id);
         });
 
-        socket.on('updateData', (data:StockOneInterface) => {
+        socket.on('updateData', (data:StockInterface) => {
+            let formattedData = {...data}
+            for (let i in data){
+                let e:StockOneInterface = data[i]
+                formattedData[i] = e
+            }
             dispatch(updateStockData({data}))
         });
-
-        const interval = setInterval(() => {
-            socket.emit("getData")
-        },1000)
-
-        return () => {
-            socket.disconnect();
-            clearInterval(interval)
-        };
     }, []);
+
+    useEffect(() => {
+        if (user && stockData && stockCurrentData) {
+            setIsLoaded(true);
+        } else {
+            setIsLoaded(false)
+        }
+    }, [user, stockData, stockCurrentData]);
 
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline/>
-            {children}
+            {isLoaded ? children : <Loading loadingStatus={"loading"}/>}
         </ThemeProvider>
     )
 }

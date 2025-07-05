@@ -7,7 +7,7 @@ export interface UserData {
     loadingStatus: string
     error: string | null
     isLoggedIn: boolean
-    user:GetUserDataInterface| {}
+    user:GetUserDataInterface| null
 }
 
 const initialState: UserData = {
@@ -15,7 +15,7 @@ const initialState: UserData = {
     loadingStatus: "",
     isLoggedIn: false,
     error: null,
-    user:{}
+    user:null
 }
 
 export const userSlice = createSlice({

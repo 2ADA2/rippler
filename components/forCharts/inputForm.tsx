@@ -89,7 +89,7 @@ export function InputForm({data, theme, currency, value, label, change}: Props) 
                     htmlFor="outlined-adornment-amount"
                     sx={{
                         color: '#f5f5f5',
-                        backgroundColor: '#121212',
+                        backgroundColor: '#181a20',
                         paddingRight: '4px',
                         '&.Mui-focused': {
                             color: 'primary.main',

@@ -1,10 +1,9 @@
 "use client"
 
 import "./trader.scss"
-import {Box, Container, flex} from "@mui/system";
+import {Box, Container} from "@mui/system";
 import Image, {StaticImageData} from "next/image";
-import React, {useEffect, useMemo, useState} from "react";
-import {testWallet, traderData} from "@/utils/testData";
+import React, {useEffect, useState} from "react";
 import {buyTheme, sellTheme} from "@/lib/theme/theme";
 import {InputForm} from "@/components/forCharts/inputForm";
 import {useParams} from "next/navigation";
@@ -12,19 +11,15 @@ import {IMAGES} from "@/utils/images";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {sortWallet} from "@/functions/sortWallet";
 import {NAMES} from "@/utils/names";
-import {CurrencyInterface, StockHistoryInterface, StockInterface, StockOneInterface} from "@/lib/globalInterfaces";
-import {Button, Card, Typography} from "@mui/material";
+import {CurrencyInterface} from "@/lib/globalInterfaces";
+import {Card, Typography} from "@mui/material";
 import Link from "next/link"
 import {useAppSelector} from "@/lib/hooks";
-import {SChart} from "@/components/charts/standard";
 import {MainChart} from "@/components/charts/main";
 
 export default function Page() {
     const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
     const {user} = useAppSelector(state => state.userReducer)
-
-    const [formattedData, setFormattedData] = useState<StockOneInterface[] | []>([]);
-    const [data, setData] = useState(traderData);
     const params: { type: string } = useParams()
     const image: StaticImageData | string = IMAGES[params.type];
     const name: string = NAMES[params.type];
@@ -43,16 +38,12 @@ export default function Page() {
 
     const [sellEuro, setSellEuro] = useState(0);
     const [sellCurrency, setSellCurrency] = useState(0);
-
-    const [date, setDate] = useState<string>("");
-    const [operation, setOperation] = useState<"purchase"|"sell"|null>(null);
-    const [currencyAmount, setCurrencyAmount] = useState(0);
-    const [euroAmount, setEuroAmount] = useState(0);
-
-    const [userError, setUserError] = useState<string|null>();
+    const [userError, setUserError] = useState<string | null>();
 
     useEffect(() => {
-        const sorted = sortWallet(testWallet, name);
+        if(!user) return
+        if(!user.wallet.wallet) return;
+        const sorted = sortWallet(user.wallet.wallet, name);
         setWallet(sorted);
         setCurrent(sorted[1]);
 
@@ -60,86 +51,58 @@ export default function Page() {
             return s + (i.count * i.coefficient);
         }, 0);
         setCapital(capital.toLocaleString());
-    }, []);
+    }, [user]);
 
     useEffect(() => {
-        if(data.name in stockData){
-            let formatted = (stockCurrentData as StockInterface)[data.name]
-            formatted = {...formatted, time: formatted.time.split(".").reverse().join("-")}
-
-            const stockExchangeData = (stockData as StockHistoryInterface)[data.name]
+        if (stockCurrentData && stockData && user && current) {
+            setPrice(stockCurrentData[current.name].close)
+            const stockExchangeData = stockData[current.name]
             const lastDay = stockExchangeData.at(-2)
-
-            setPrice(formatted.close)
-            if(lastDay){
+            if (lastDay) {
                 setMinDay(lastDay.low)
                 setMaxDay(lastDay.high)
             }
         }
     }, [stockCurrentData]);
 
-    useEffect(() => {
-        if(data.name in stockData){
-            const stockExchangeData = (stockData as StockHistoryInterface)[data.name]
-            const formatted = stockExchangeData.map(e => {
-                e = {...e, time: e.time.split(".").reverse().join("-")}
-                return e
-            })
-            setFormattedData(formatted)
-        }
-    }, [stockData]);
-
     function buyCurrencyHandler(val: number) {
         setBuyCurrency(val)
-        setBuyEuro(val * current!.coefficient)
+        const amount = Number((val * price).toFixed(5))
+        setBuyEuro(amount)
     }
 
     function buyEuroHandler(val: number) {
         setBuyEuro(val)
-        setBuyCurrency(val / current!.coefficient)
+        const amount = Number((val / price).toFixed(5))
+        setBuyCurrency(amount)
     }
 
     function sellCurrencyHandler(val: number) {
         setSellCurrency(val)
-        setSellEuro(val * current!.coefficient)
+        const amount = Number((val * price).toFixed(5))
+        setSellEuro(amount)
     }
 
     function sellEuroHandler(val: number) {
         setSellEuro(val)
-        setSellCurrency(val / current!.coefficient)
+        const amount = Number((val / price).toFixed(5))
+        setSellCurrency(amount)
     }
 
 
-    function approvePurchase(){
-        if(buyEuro >= 0.01 && buyCurrency >= 0.01){
-            setOperation("purchase")
-            setEuroAmount(buyEuro)
-            setCurrencyAmount(buyCurrency)
-            setDate(new Date().toLocaleDateString())
-            setUserError("")
-            window.scrollBy(0,1000)
-        } else{
-            setUserError("")
-            setTimeout(() => {
-                setUserError("the transaction must include more than 0.01 euro and currency")
-            })
-        }
+    function approvePurchase() {
+        if(!buyCurrency) return;
+        setBuyEuro(0)
+        setBuyCurrency(0)
     }
 
-    function approveSell(){
-        if(sellEuro >= 0.01 && sellCurrency >= 0.01){
-            setOperation("sell")
-            setEuroAmount(buyEuro)
-            setCurrencyAmount(buyCurrency)
-            setDate(new Date().toLocaleDateString())
-            setUserError("")
-        }  else{
-            setUserError("")
-            setTimeout(() => {
-                setUserError("the transaction must include more than 0.01 euro and currency")
-            })
-        }
+    function approveSell() {
+        if(!sellCurrency) return;
+        setSellCurrency(0)
+        setSellEuro(0)
     }
+
+    if(!current) return <></>
 
     return (
         <>
@@ -154,8 +117,8 @@ export default function Page() {
                         className={"user-header-img"}
                     />
                     <div className={"header-block"}>
-                        <span>{data.shortName}</span>
-                        <span>{data.name}</span>
+                        <span>{current.shortName}</span>
+                        <span>{current.name}</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Current price</span>
@@ -171,16 +134,20 @@ export default function Page() {
                     </div>
                     <div className={"header-block"}>
                         <span>Sales volume</span>
-                        <span style={{color: "#d4e157"}}>{data.salesVol.toLocaleString()} €</span>
+                        <span style={{color: "#d4e157"}}>1000 €</span>
                     </div>
-                    <div className={"header-block items-center flex-col items-center flex justify-center"} style={{background: "#263238", height:60}}>
-                        <span style={{color: "#cfd8dc"}}>1 {data.shortName}</span>
-                        <span style={{color: "#80cbc4", fontWeight: 500}}>{Number(price.toFixed(2)).toLocaleString()} €</span>
+                    <div className={"header-block items-center flex-col items-center flex justify-center"}
+                         style={{background: "#263238", height: 60}}>
+                        <span style={{color: "#cfd8dc"}}>1 {current.shortName}</span>
+                        <span style={{
+                            color: "#80cbc4",
+                            fontWeight: 500
+                        }}>{Number(price.toFixed(2)).toLocaleString()} €</span>
                     </div>
                 </Box>
 
                 <Container className="chart-container">
-                    <MainChart data={formattedData}/>
+                    <MainChart/>
                 </Container>
 
                 <Container className={"history"}>
@@ -227,13 +194,21 @@ export default function Page() {
                                                     alignItems: "center",
 
                                                 }}>
-                                                    <Typography textAlign={"start"}
-                                                                sx={{width: "100%"}}>{e.count.toLocaleString()} {e.shortName}</Typography>
+                                                    <Typography
+                                                        textAlign={"start"}
+                                                        sx={{width: "100%"}}
+                                                    >
+                                                        {e.count.toLocaleString()} {e.shortName}
+                                                    </Typography>
+
                                                     <Typography textAlign={"start"} sx={{
                                                         width: "100%",
                                                         fontWeight: 100,
                                                         fontSize: 16
-                                                    }}>{(e.count * e.coefficient).toLocaleString()} €</Typography>
+                                                    }}>
+                                                        {(e.count * e.coefficient).toLocaleString()} €
+                                                    </Typography>
+
                                                 </Box>
                                             </Card>
                                         </SwiperSlide>
@@ -248,17 +223,17 @@ export default function Page() {
                         {userError && <Box className={"user-error"}>{userError}</Box>}
                     </div>
                     <Box className={"buy"}>
-                        <h5>Buy {data.shortName}</h5>
+                        <h5>Buy {current.shortName}</h5>
                         <InputForm
-                            data={data}
+                            data={current}
                             theme={buyTheme}
                             currency="€"
                             value={buyEuro}
-                            label={"Buy " + data.shortName + " for"}
+                            label={"Buy " + current.shortName + " for"}
                             change={(val: number) => buyEuroHandler(val)}
                         />
                         <InputForm
-                            data={data}
+                            data={current}
                             theme={buyTheme}
                             currency={
                                 <Image
@@ -269,7 +244,7 @@ export default function Page() {
                                 />
                             }
                             value={buyCurrency}
-                            label={"Buy " + data.shortName}
+                            label={"Buy " + current.shortName}
                             change={(val: number) => buyCurrencyHandler(val)}
                         />
 
@@ -277,17 +252,17 @@ export default function Page() {
                     </Box>
 
                     <Box className={"sale"}>
-                        <h5>Sale {data.shortName}</h5>
+                        <h5>Sale {current.shortName}</h5>
                         <InputForm
-                            data={data}
+                            data={current}
                             theme={sellTheme}
                             currency="€"
                             value={sellEuro}
-                            label={"Sell " + data.shortName + " for"}
+                            label={"Sell " + current.shortName + " for"}
                             change={(val: number) => sellEuroHandler(val)}
                         />
                         <InputForm
-                            data={data}
+                            data={current}
                             theme={sellTheme}
                             currency={
                                 <Image
@@ -298,35 +273,13 @@ export default function Page() {
                                 />
                             }
                             value={sellCurrency}
-                            label={"Sell " + data.shortName}
+                            label={"Sell " + current.shortName}
                             change={(val: number) => sellCurrencyHandler(val)}
                         />
 
                         <button className={"approve-btn"} onClick={() => approveSell()}>Approve sell</button>
                     </Box>
 
-                </Container>
-                <Container className = {"operation-confirmation rounded-xl mt-4"}>
-                    <h5>Confirmation of operation</h5>
-                    <Box className={"confirmation-block"}>
-                        <span>Operation</span>
-                        <span>{operation || "no operation"}</span>
-                    </Box>
-                    <Box className={"confirmation-block"}>
-                        <span>Amount of {data.shortName} ( {data.name} )</span>
-                        <span style={{color: operation ? "#b9f6ca" : "white"}}>{currencyAmount || "no operation"}</span>
-                    </Box>
-                    <Box className={"confirmation-block"}>
-                        <span>Amount of EUR ( Euro )</span>
-                        <span style={{color: operation ? "#b9f6ca" : "white"}}>{euroAmount || "no operation"}</span>
-                    </Box>
-                    <Box className={"confirmation-block"}>
-                        <span>Current date</span>
-                        <span>{date.toLocaleString() || "no operation"}</span>
-                    </Box>
-                    {(data && operation) &&
-                        <button className={"approve-btn"} style={{width: 300,margin:"20px auto 0 auto"}}>Approve the operation </button>
-                    }
                 </Container>
             </section>
         </>

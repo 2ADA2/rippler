@@ -4,6 +4,7 @@ import {useAppSelector} from "@/lib/hooks";
 import Image from "next/image";
 import RIPPLERIMG from "../public/ripplerico.svg"
 import {useEffect, useState} from "react";
+import {Loading} from "@/components/loading";
 
 
 export const Header = () => {
@@ -12,11 +13,13 @@ export const Header = () => {
     const [rippler, setRippler] = useState(0);
 
     useEffect(() => {
-        if("username" in user){
+        if(user){
             setEuro(user.wallet.wallet[0].count)
             setRippler(user.wallet.wallet[1].count)
         }
     }, [user]);
+
+    if(!user) return <></>;
 
     return (
         <header className="flex justify-between items-center gap-3">
@@ -39,7 +42,7 @@ export const Header = () => {
             </nav>
             <div className={"grid grid-cols-2 grid-rows-3 user-header-info"}>
                 {isLoggedIn && <>
-                    <Link href={"/dashboard"}>ada</Link>
+                    <Link href={"/dashboard"}>{user.username}</Link>
                     <Link href={"/wallet"}>{euro} €</Link>
                     <Link href ={"/donate"}>{rippler} R</Link>
                     <a className={"user-header-img"}>

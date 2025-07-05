@@ -5,7 +5,7 @@ export function sortWallet(
     wallet: CurrencyInterface[],
     priority: string
 ): CurrencyInterface[] {
-    let newWallet:CurrencyInterface[] = wallet.sort((a,b) => {
+    let newWallet:CurrencyInterface[] = [...wallet].sort((a,b) => {
         if(a.name === "Euro"){
             return 1
         }else if(b.name === "Euro") {
