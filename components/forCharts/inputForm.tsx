@@ -2,9 +2,6 @@
 import {FormControl, InputAdornment, InputLabel, OutlinedInput, Typography} from "@mui/material";
 import React, {ReactNode, useEffect, useState} from "react";
 import {Theme, ThemeProvider} from "@mui/system";
-import {useParams} from "next/navigation";
-import {StaticImageData} from "next/image";
-import {IMAGES} from "@/utils/images";
 
 interface Props {
     data: any;

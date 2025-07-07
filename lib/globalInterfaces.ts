@@ -5,6 +5,11 @@ export interface CurrencyInterface {
     coefficient: number;
     code:number,
 }
+export interface CurrencyDataInterface {
+    name: string;
+    shortName: string;
+    code:number,
+}
 
 export interface GetUserDataInterface {
     username: string;

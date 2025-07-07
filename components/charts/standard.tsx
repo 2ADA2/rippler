@@ -36,8 +36,7 @@ export const SChart: React.FC<ChartData> = ({data}) => {
             wickDownColor: '#ef5350',
         });
 
-        candlestickSeries.setData(testChartData);
-        chart.timeScale().scrollToRealTime();
+        candlestickSeries.setData(testChartData)
 
 
 
@@ -64,6 +63,7 @@ export const SChart: React.FC<ChartData> = ({data}) => {
                 mode:0,
             }
         })
+        chart.timeScale().fitContent();
 
         const resizeObserver = new ResizeObserver(() => {
             if (containerRef.current) {

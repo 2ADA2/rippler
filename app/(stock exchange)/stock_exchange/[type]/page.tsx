@@ -3,7 +3,7 @@
 import "./trader.scss"
 import {Box, Container} from "@mui/system";
 import Image, {StaticImageData} from "next/image";
-import React, {useEffect, useState} from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import {buyTheme, sellTheme} from "@/lib/theme/theme";
 import {InputForm} from "@/components/forCharts/inputForm";
 import {useParams} from "next/navigation";
@@ -12,16 +12,23 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {sortWallet} from "@/functions/sortWallet";
 import {NAMES} from "@/utils/names";
 import {CurrencyInterface, GetUserDataInterface, GetWalletInterface} from "@/lib/globalInterfaces";
-import {Card, Typography} from "@mui/material";
+import {Card, Slider, Typography} from "@mui/material";
 import Link from "next/link"
 import {useAppSelector} from "@/lib/hooks";
 import {MainChart} from "@/components/charts/main";
 import {skeletonWallet} from "@/utils/skeletonData";
 import {createOperation} from "@/functions/createOperation";
 import {getCookie} from "typescript-cookie";
+import {PriceTable} from "@/components/forCharts/priceTable";
+import {getUserData} from "@/functions/getUserData";
+import {setUserData} from "@/lib/features/user/UserSlice";
+import {useDispatch} from "react-redux";
+import {formatter} from "@/utils/formatter";
+import {PriceHistory} from "@/components/forCharts/priceHistory";
 
 export default function Page() {
     const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
+    const dispatch = useDispatch()
     const {user} = useAppSelector(state => state.userReducer)
     const params: { type: string } = useParams()
     const image: StaticImageData | string = IMAGES[params.type];
@@ -38,10 +45,14 @@ export default function Page() {
 
     const [buyEuro, setBuyEuro] = useState(0);
     const [buyCurrency, setBuyCurrency] = useState(0);
+    const [buyPercents, setBuyPercents] = React.useState<number>(0);
 
     const [sellEuro, setSellEuro] = useState(0);
     const [sellCurrency, setSellCurrency] = useState(0);
+    const [sellPercents, setSellPercents] = React.useState<number>(0);
+
     const [userError, setUserError] = useState<string | null>();
+    const [isWalletLoading, setIsWalletLoading] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -81,20 +92,36 @@ export default function Page() {
         setBuyCurrency(val)
         const amount = Number((val * price).toFixed(5))
         setBuyEuro(amount)
+        setBuyPercents(Math.floor(10000 * val*price/wallet[0].count)/100)
     }
 
-    function buyEuroHandler(val: number) {
+    function buyEuroHandler(val: number, isConvertion = false) {
         setUserError("")
         setBuyEuro(val)
         const amount = Number((val / price).toFixed(5))
         setBuyCurrency(amount)
+        if(!isConvertion){
+            setBuyPercents(Math.floor(10000 * val/wallet[0].count)/100)
+        }
     }
 
-    function sellCurrencyHandler(val: number) {
+    function buySliderHandler(e: Event, newVal: number) {
+        if(e.target){
+            setBuyPercents(newVal)
+            buyEuroHandler(Number((wallet[0].count * newVal/100).toFixed(5)), true)
+        }
+    }
+
+
+    function sellCurrencyHandler(val: number, isConvertion = false) {
         setSellCurrency(val)
         setUserError("")
         const amount = Number((val * price).toFixed(5))
         setSellEuro(amount)
+        if(!isConvertion){
+            setSellPercents( Math.floor(10000 * val/wallet[1].count)/100)
+        }
+
     }
 
     function sellEuroHandler(val: number) {
@@ -102,6 +129,14 @@ export default function Page() {
         setSellEuro(val)
         const amount = Number((val / price).toFixed(5))
         setSellCurrency(amount)
+        setSellPercents( Math.floor(10000 * val / price/wallet[1].count)/100)
+    }
+
+    function sellSliderHandler(e: Event | null, newVal: number) {
+        if(e){
+            setSellPercents(newVal)
+            sellCurrencyHandler(Number((wallet[1].count * newVal/100).toFixed(5)), true)
+        }
     }
 
 
@@ -130,9 +165,14 @@ export default function Page() {
                 return
             }
             setUserError("")
-            createOperation(token, "buy", buyCurrency, current.name).then((data) => {
-                console.log(data)
+            setIsWalletLoading(true)
+            createOperation(token, "buy", buyCurrency, current.name).then(() => {
+                getUserData(token).then((data: GetUserDataInterface) => {
+                    dispatch(setUserData({userData: data}))
+                    setIsWalletLoading(false)
+                })
             })
+            setUserError("")
             setBuyEuro(0)
             setBuyCurrency(0)
         }
@@ -141,7 +181,7 @@ export default function Page() {
     function approveSell() {
         const token = getCookie("token")
         if (sellCurrency && user && current && token) {
-            if (sellEuro > user.wallet.wallet[0].count) {
+            if (sellCurrency > wallet[1].count) {
                 setUserError("")
                 setTimeout(() => {
                     setUserError("You don't have enough money.")
@@ -162,9 +202,12 @@ export default function Page() {
                 })
                 return
             }
-            createOperation(token, "sell", sellCurrency, current.name).then((data:GetWalletInterface) => {
-                let newUser:GetUserDataInterface = {...user}
-                newUser.wallet.wallet = data.wallet.wallet
+            setIsWalletLoading(true)
+            createOperation(token, "sell", sellCurrency, current.name).then(() => {
+                getUserData(token).then((data: GetUserDataInterface) => {
+                    dispatch(setUserData({userData: data}))
+                    setIsWalletLoading(false)
+                })
             })
             setUserError("")
             setSellEuro(0)
@@ -217,12 +260,14 @@ export default function Page() {
                 </Box>
 
                 <Container className="chart-container">
-                    <MainChart/>
+                    <div style={{width:"99%"}}>
+                        <MainChart/>
+                    </div>
                 </Container>
 
-                <Container className={"history"}>
-                    <Box className={"purchases"}>purchases</Box>
-                    <Box className={"sales"}>sales</Box>
+                <Container className={"history flex flex-col gap-2 overflow-hidden"}>
+                    <PriceTable/>
+                    {current && <PriceHistory currency={current}/>}
                 </Container>
 
                 <Container className="orders">
@@ -236,7 +281,7 @@ export default function Page() {
                             <span style={{fontSize: 16, fontWeight: 100}}>All capital <span
                                 style={{color: "#b9f6ca"}}>{capital} €</span></span>
                         </div>
-                        {(wallet.length > 1) && <Swiper slidesPerView={"auto"} spaceBetween={10}>
+                        {(wallet.length > 1 && !isWalletLoading) ? <Swiper slidesPerView={"auto"} spaceBetween={10}>
                             {
                                 wallet.map((e, i) => {
                                     return (
@@ -288,7 +333,16 @@ export default function Page() {
                             {
                                 !wallet.length && <Card sx={{width: 150, height: 50, p: 2}}></Card>
                             }
-                        </Swiper>
+                        </Swiper> :
+                            <Card className={"p-10 flex gap-2 items-center height-full"} sx = {{background:"#263238", height:80}}>
+                                <Image
+                                    src={image}
+                                    width={50}
+                                    height={50}
+                                    alt={"rippler logo"}
+                                />
+                                <Typography variant={"h6"}>Rippler updates your wallet</Typography>
+                            </Card>
                         }
                         {userError && <Box className={"user-error"}>{userError}</Box>}
                     </div>
@@ -317,8 +371,19 @@ export default function Page() {
                             label={"Buy " + current.shortName}
                             change={(val: number) => buyCurrencyHandler(val)}
                         />
+                        <Box sx={{ width: "100%", display:"grid", gridTemplateColumns:"3fr 1fr", textAlign: "center" }}>
+                            <Slider
+                                aria-label="Buy (%)"
+                                defaultValue={0}
+                                color="success"
+                                step={0.1}
+                                onChange={buySliderHandler}
+                                value={buyPercents}
+                            />
+                            <Typography variant={"caption"}>{buyPercents} %</Typography>
+                        </Box>
 
-                        <button className={"approve-btn"} onClick={() => approvePurchase()}>Approve purchase</button>
+                        <button className={"approve-btn mt-2"} onClick={() => approvePurchase()}>Approve purchase</button>
                     </Box>
 
                     <Box className={"sale"}>
@@ -346,8 +411,19 @@ export default function Page() {
                             label={"Sell " + current.shortName}
                             change={(val: number) => sellCurrencyHandler(val)}
                         />
+                        <Box sx={{ width: "100%", display:"grid", gridTemplateColumns:"3fr 1fr", textAlign: "center" }}>
+                            <Slider
+                                aria-label="Sell (%)"
+                                defaultValue={0}
+                                value={sellPercents}
+                                color="secondary"
+                                step={0.1}
+                                onChange={sellSliderHandler}
+                            />
+                            <Typography variant={"caption"}>{sellPercents} %</Typography>
+                        </Box>
 
-                        <button className={"approve-btn"} onClick={() => approveSell()}>Approve sell</button>
+                        <button className={"approve-btn mt-2"} onClick={() => approveSell()}>Approve sell</button>
                     </Box>
 
                 </Container>

@@ -53,6 +53,12 @@ export const MainChart: React.FC = () => {
         if (!chartContainerRef.current || !stockData) return;
         if(!stockData["Rippler"]) return;
 
+        const currentLocale = window.navigator.languages[0];
+        const myPriceFormatter = Intl.NumberFormat(currentLocale, {
+            style: 'currency',
+            currency: 'EUR', // Currency for data points
+        }).format;
+
         const chart = createChart(chartContainerRef.current, {
             layout: {
                 background: { type: ColorType.Solid, color: colors.backgroundColor },
@@ -60,6 +66,7 @@ export const MainChart: React.FC = () => {
             },
             localization:{
                 locale:"en-US",
+                priceFormatter:myPriceFormatter,
             },
             width: chartContainerRef.current.clientWidth,
             height: 400,
@@ -71,6 +78,9 @@ export const MainChart: React.FC = () => {
                 horzLines: {
                     color:'#252931',
                 }
+            },
+            crosshair:{
+                mode:0
             }
         });
 
@@ -93,9 +103,7 @@ export const MainChart: React.FC = () => {
             if (chartContainerRef.current && chartRef.current) {
                 chartRef.current.applyOptions({
                     width: chartContainerRef.current.clientWidth,
-                    crosshair:{
-                        mode:0, 
-                    }
+
                 });
             }
         };
@@ -123,5 +131,5 @@ export const MainChart: React.FC = () => {
         }
     }, [stockCurrentData]);
 
-    return <div ref={chartContainerRef} style={{ width: '99.9%', height: 300, margin:"auto" }} />;
+    return <div ref={chartContainerRef} style={{height: "100%", margin:"auto", width:"100%" }} />;
 };
