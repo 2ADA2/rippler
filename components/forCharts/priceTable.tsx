@@ -63,7 +63,7 @@ export function PriceTable() {
         <Card className={"flex flex-col gap-1 w-full priceTable mt-5"}>
             {formatted.map((e) => {
                 return (
-                    <Box key = {e.name} sx = {{gridTemplateColumns:"40px repeat(5, 1fr)"}} className={"p-1 grid items-center text-center g-1"}>
+                    <Box key = {e.name} sx = {{gridTemplateColumns:"40px 50px repeat(3, 1fr) 40px"}} className={"p-1 grid items-center text-center g-1"}>
                         <Image
                             src ={IMAGES[e.name.toLowerCase()]}
                             alt = "icon"

@@ -41,7 +41,7 @@ export const userSlice = createSlice({
             let wallet:CurrencyInterface[] = userdata.wallet.wallet
 
             wallet.map(e => {
-                e.count = Math.floor(e.count*100)/100
+                e.count = Math.floor(e.count*1000000)/1000000
                 return e
             })
 

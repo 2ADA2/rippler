@@ -20,10 +20,6 @@
       gap: 4px;
       width: auto;
       font-size: 16px;
-
-      & :last-child {
-        font-weight: 100;
-      }
     }
 
   }
@@ -102,10 +98,5 @@
 @media (max-width:1600px){
   .trade-container {
     grid-template-columns:  1fr 2fr 1fr;
-  }
-}
-@media (max-width:1400px){
-  .trade-container {
-    grid-template-columns:  100px auto 100px;
   }
 }

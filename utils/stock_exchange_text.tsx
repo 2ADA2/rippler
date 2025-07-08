@@ -8,48 +8,18 @@ export const positions:SECardInterface[] = [
     {
         name: "Rippler",
         description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
+        categories: ["for beginners", "popular"]
     }, {
-        name: "Rippler 2",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    }, {
-        name: "Rippler 3",
+        name: "Innovate",
         description: "Rippler own crypto, always stable, beginner friendly, cheap",
         categories: ["for beginners"]
     }, {
-        name: "Rippler 4",
+        name: "Kilowatt",
         description: "Rippler own crypto, always stable, beginner friendly, cheap",
         categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 5",
+    }, {
+        name: "ADA",
         description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 6",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 7",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 8",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 9",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
-    },
-    {
-        name: "Rippler 10",
-        description: "Rippler own crypto, always stable, beginner friendly, cheap",
-        categories: ["for beginners"]
+        categories: ["hard"]
     },
 ]

@@ -88,6 +88,7 @@ export default function Page() {
                                     name={position.name}
                                     description={position.description}
                                     categories={position.categories}
+                                    key = {id + "s"}
                                 />
                             </SwiperSlide>
                         ))}

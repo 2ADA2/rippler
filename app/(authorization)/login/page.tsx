@@ -7,6 +7,7 @@ import {setIsLoggedIn, setUserData} from "@/lib/features/user/UserSlice";
 import {getUserData} from "@/functions/getUserData";
 import {GetUserDataInterface} from "@/lib/globalInterfaces";
 import {getCookie} from "typescript-cookie";
+import {redirect} from "next/navigation";
 
 
 export default function Page() {
@@ -25,6 +26,7 @@ export default function Page() {
                 dispatch(setUserData({userData: data}))
             }).then(() => {
             dispatch(setIsLoggedIn({isLoggedIn: true}));
+            redirect("/dashboard")
 
         })
     }

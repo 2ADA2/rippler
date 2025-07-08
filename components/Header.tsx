@@ -5,6 +5,7 @@ import Image from "next/image";
 import RIPPLERIMG from "../public/ripplerico.svg"
 import {useEffect, useState} from "react";
 import {Loading} from "@/components/loading";
+import {formatter} from "@/utils/formatter";
 
 
 export const Header = () => {
@@ -42,7 +43,7 @@ export const Header = () => {
             <div className={"grid grid-cols-2 grid-rows-3 user-header-info"}>
                 {user && <>
                     <Link href={"/dashboard"}>{user.username}</Link>
-                    <Link href={"/wallet"}>{euro} €</Link>
+                    <Link href={"/wallet"}>{formatter.format(euro)}</Link>
                     <Link href ={"/donate"}>{rippler} R</Link>
                     <a className={"user-header-img"}>
                         <Image

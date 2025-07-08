@@ -59,6 +59,7 @@ export default function Page() {
             const sorted = sortWallet(skeletonWallet, name);
             setWallet(sorted);
             setCurrent(sorted[1]);
+            console.log(wallet)
         } else {
 
             const sorted = sortWallet(user.wallet.wallet, name);
@@ -92,7 +93,7 @@ export default function Page() {
         setBuyCurrency(val)
         const amount = Number((val * price).toFixed(5))
         setBuyEuro(amount)
-        setBuyPercents(Math.floor(10000 * val*price/wallet[0].count)/100)
+        setBuyPercents(Math.floor(10000 * val * price / wallet[0].count) / 100)
     }
 
     function buyEuroHandler(val: number, isConvertion = false) {
@@ -100,15 +101,15 @@ export default function Page() {
         setBuyEuro(val)
         const amount = Number((val / price).toFixed(5))
         setBuyCurrency(amount)
-        if(!isConvertion){
-            setBuyPercents(Math.floor(10000 * val/wallet[0].count)/100)
+        if (!isConvertion) {
+            setBuyPercents(Math.floor(10000 * val / wallet[0].count) / 100)
         }
     }
 
     function buySliderHandler(e: Event, newVal: number) {
-        if(e.target){
+        if (e.target) {
             setBuyPercents(newVal)
-            buyEuroHandler(Number((wallet[0].count * newVal/100).toFixed(5)), true)
+            buyEuroHandler(Number((wallet[0].count * newVal / 100).toFixed(5)), true)
         }
     }
 
@@ -118,8 +119,8 @@ export default function Page() {
         setUserError("")
         const amount = Number((val * price).toFixed(5))
         setSellEuro(amount)
-        if(!isConvertion){
-            setSellPercents( Math.floor(10000 * val/wallet[1].count)/100)
+        if (!isConvertion) {
+            setSellPercents(Math.floor(10000 * val / wallet[1].count) / 100)
         }
 
     }
@@ -129,13 +130,13 @@ export default function Page() {
         setSellEuro(val)
         const amount = Number((val / price).toFixed(5))
         setSellCurrency(amount)
-        setSellPercents( Math.floor(10000 * val / price/wallet[1].count)/100)
+        setSellPercents(Math.floor(10000 * val / price / wallet[1].count) / 100)
     }
 
     function sellSliderHandler(e: Event | null, newVal: number) {
-        if(e){
+        if (e) {
             setSellPercents(newVal)
-            sellCurrencyHandler(Number((wallet[1].count * newVal/100).toFixed(5)), true)
+            sellCurrencyHandler(Number((wallet[1].count * newVal / 100).toFixed(5)), true)
         }
     }
 
@@ -166,7 +167,7 @@ export default function Page() {
             }
             setUserError("")
             setIsWalletLoading(true)
-            createOperation(token, "buy", buyCurrency, current.name).then(() => {
+            createOperation(token, "buy", buyEuro, current.name).then(() => {
                 getUserData(token).then((data: GetUserDataInterface) => {
                     dispatch(setUserData({userData: data}))
                     setIsWalletLoading(false)
@@ -175,6 +176,7 @@ export default function Page() {
             setUserError("")
             setBuyEuro(0)
             setBuyCurrency(0)
+            setBuyPercents(0)
         }
     }
 
@@ -212,6 +214,7 @@ export default function Page() {
             setUserError("")
             setSellEuro(0)
             setSellCurrency(0)
+            setSellPercents(0)
         }
     }
 
@@ -221,7 +224,7 @@ export default function Page() {
         <>
             <section className={"trade-container"}>
                 <Box className={"trade-header"}
-                     sx={{display: "grid", alignItems: "center", gridTemplateColumns: " 60px repeat(6, 1fr)"}}>
+                     sx={{display: "grid", alignItems: "center", gridTemplateColumns: " 60px repeat(8, 1fr)"}}>
                     <Image
                         src={image}
                         width={"50"}
@@ -234,20 +237,31 @@ export default function Page() {
                         <span>{current.name}</span>
                     </div>
                     <div className={"header-block"}>
-                        <span>Current price</span>
-                        <span style={{color: "#b9f6ca"}}>{Number(price.toFixed(2)).toLocaleString()} €</span>
-                    </div>
-                    <div className={"header-block"}>
                         <span>Max in 24h </span>
-                        <span style={{color: "#f50057"}}>{Number(maxDay.toFixed(2)).toLocaleString()} €</span>
+                        <span style={{color: "#fa5f5c"}}>{formatter.format(maxDay)}</span>
                     </div>
                     <div className={"header-block"}>
                         <span>Min in 24h</span>
-                        <span style={{color: "#81d4fa"}}>{Number(minDay.toFixed(2)).toLocaleString()} €</span>
+                        <span style={{color: "#6ef3e6"}}>{formatter.format(minDay)}</span>
                     </div>
                     <div className={"header-block"}>
-                        <span>Sales volume</span>
-                        <span style={{color: "#d4e157"}}>1000 €</span>
+                        <span>Low</span>
+                        <span
+                            style={{color: "#a8f3eb"}}>{stockCurrentData && formatter.format(stockCurrentData[current.name].low)}</span>
+                    </div>
+                    <div className={"header-block"}>
+                        <span>High</span>
+                        <span
+                            style={{color: "#fa7b78"}}>{stockCurrentData && formatter.format(stockCurrentData[current.name].high)}</span>
+                    </div>
+                    <div className={"header-block"}>
+                        <span>Open</span>
+                        <span
+                            style={{color: "#b9f6ca"}}>{stockCurrentData && formatter.format(stockCurrentData[current.name].open)}</span>
+                    </div>
+                    <div className={"header-block"}>
+                        <span>Server time</span>
+                        <span style={{color: "#d4e157"}}>{stockCurrentData && stockCurrentData[current.name].time}</span>
                     </div>
                     <div className={"header-block items-center flex-col items-center flex justify-center"}
                          style={{background: "#263238", height: 60}}>
@@ -260,7 +274,7 @@ export default function Page() {
                 </Box>
 
                 <Container className="chart-container">
-                    <div style={{width:"99%"}}>
+                    <div style={{width: "99%"}}>
                         <MainChart/>
                     </div>
                 </Container>
@@ -271,162 +285,188 @@ export default function Page() {
                 </Container>
 
                 <Container className="orders">
-                    orders
+                orders
                 </Container>
 
-                <Container className={"finance-control"}>
-                    <div className={"finance-control-header mt-2"}>
-                        <div className={"pb-4 flex items-center gap-2 "}>
-                            <Link href={"/finance"}>Your wallet</Link>
-                            <span style={{fontSize: 16, fontWeight: 100}}>All capital <span
-                                style={{color: "#b9f6ca"}}>{capital} €</span></span>
-                        </div>
-                        {(wallet.length > 1 && !isWalletLoading) ? <Swiper slidesPerView={"auto"} spaceBetween={10}>
-                            {
-                                wallet.map((e, i) => {
-                                    return (
-                                        <SwiperSlide style={{width: "auto"}}>
-                                            <Card sx={{
-                                                display: "flex",
-                                                p: 2,
-                                                backgroundColor: (i <= 1) ? "#263238" : ""
-                                            }}>
-                                                <Box sx={{width: "50px", mr: 1}}>
-                                                    {Object.keys(IMAGES)[e.code] === "euro" ?
-                                                        <div style={{fontSize: 36, textAlign: "center",}}>€</div>
-                                                        : <Image
-                                                            src={IMAGES[Object.keys(IMAGES)[e.code]]}
-                                                            alt={"image"}
-                                                            width={50}
-                                                            height={50}
-                                                            className={"rounded-xl"}
-                                                        />
-                                                    }
-                                                </Box>
-                                                <Box sx={{
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    alignItems: "center",
-
-                                                }}>
-                                                    <Typography
-                                                        textAlign={"start"}
-                                                        sx={{width: "100%"}}
-                                                    >
-                                                        {e.count.toLocaleString()} {e.shortName}
-                                                    </Typography>
-
-                                                    <Typography textAlign={"start"} sx={{
-                                                        width: "100%",
-                                                        fontWeight: 100,
-                                                        fontSize: 16
+                {(user) ?
+                    <Container className={"finance-control"}>
+                        <div className={"finance-control-header mt-2"}>
+                            <div className={"pb-4 flex items-center gap-2 "}>
+                                <Link href={"/finance"}>Your wallet</Link>
+                                <span style={{fontSize: 16, fontWeight: 100}}>All capital <span
+                                    style={{color: "#b9f6ca"}}>{capital} €</span></span>
+                            </div>
+                            {(wallet.length > 1 && !isWalletLoading) ? <Swiper slidesPerView={"auto"} spaceBetween={10}>
+                                    {
+                                        wallet.map((e, i) => {
+                                            return (
+                                                <SwiperSlide style={{width: "auto"}}>
+                                                    <Card sx={{
+                                                        display: "flex",
+                                                        p: 2,
+                                                        backgroundColor: (i <= 1) ? "#263238" : ""
                                                     }}>
-                                                        {e.name === "Euro" ? e.count : stockCurrentData && (stockCurrentData[e.name].close * wallet[i].count).toLocaleString()} €
-                                                    </Typography>
+                                                        <Box sx={{width: "50px", mr: 1}}>
+                                                            {Object.keys(IMAGES)[e.code] === "euro" ?
+                                                                <div style={{fontSize: 36, textAlign: "center",}}>€</div>
+                                                                : <Image
+                                                                    src={IMAGES[Object.keys(IMAGES)[e.code]]}
+                                                                    alt={"image"}
+                                                                    width={50}
+                                                                    height={50}
+                                                                    className={"rounded-xl"}
+                                                                />
+                                                            }
+                                                        </Box>
+                                                        <Box sx={{
+                                                            display: "flex",
+                                                            flexDirection: "column",
+                                                            alignItems: "center",
 
-                                                </Box>
-                                            </Card>
-                                        </SwiperSlide>
-                                    )
-                                })
+                                                        }}>
+                                                            <Typography
+                                                                textAlign={"start"}
+                                                                sx={{width: "100%"}}
+                                                            >
+                                                                {e.count.toLocaleString()} {e.shortName}
+                                                            </Typography>
+
+                                                            <Typography textAlign={"start"} sx={{
+                                                                width: "100%",
+                                                                fontWeight: 100,
+                                                                fontSize: 16
+                                                            }}>
+                                                                {e.name === "Euro" ? e.count : stockCurrentData && (stockCurrentData[e.name].close * wallet[i].count).toLocaleString()} €
+                                                            </Typography>
+
+                                                        </Box>
+                                                    </Card>
+                                                </SwiperSlide>
+                                            )
+                                        })
+                                    }
+                                    {
+                                        !wallet.length && <Card sx={{width: 150, height: 50, p: 2}}></Card>
+                                    }
+                                </Swiper> :
+                                <Card className={"p-10 flex gap-2 items-center height-full"}
+                                      sx={{background: "#263238", height: 80}}>
+                                    <Image
+                                        src={image}
+                                        width={50}
+                                        height={50}
+                                        alt={"rippler logo"}
+                                    />
+                                    <Typography variant={"h6"}>Rippler updates your wallet</Typography>
+                                </Card>
                             }
-                            {
-                                !wallet.length && <Card sx={{width: 150, height: 50, p: 2}}></Card>
-                            }
-                        </Swiper> :
-                            <Card className={"p-10 flex gap-2 items-center height-full"} sx = {{background:"#263238", height:80}}>
-                                <Image
-                                    src={image}
-                                    width={50}
-                                    height={50}
-                                    alt={"rippler logo"}
-                                />
-                                <Typography variant={"h6"}>Rippler updates your wallet</Typography>
-                            </Card>
-                        }
-                        {userError && <Box className={"user-error"}>{userError}</Box>}
-                    </div>
-                    <Box className={"buy"}>
-                        <h5>Buy {current.shortName}</h5>
-                        <InputForm
-                            data={current}
-                            theme={buyTheme}
-                            currency="€"
-                            value={buyEuro}
-                            label={"Buy " + current.shortName + " for"}
-                            change={(val: number) => buyEuroHandler(val)}
-                        />
-                        <InputForm
-                            data={current}
-                            theme={buyTheme}
-                            currency={
-                                <Image
-                                    src={image}
-                                    width={30}
-                                    height={30}
-                                    alt={"rippler logo"}
-                                />
-                            }
-                            value={buyCurrency}
-                            label={"Buy " + current.shortName}
-                            change={(val: number) => buyCurrencyHandler(val)}
-                        />
-                        <Box sx={{ width: "100%", display:"grid", gridTemplateColumns:"3fr 1fr", textAlign: "center" }}>
-                            <Slider
-                                aria-label="Buy (%)"
-                                defaultValue={0}
-                                color="success"
-                                step={0.1}
-                                onChange={buySliderHandler}
-                                value={buyPercents}
+                            {userError && <Box className={"user-error"}>{userError}</Box>}
+                        </div>
+                        <Box className={"buy"}>
+                            <h5>Buy {current.shortName}</h5>
+                            <InputForm
+                                data={current}
+                                theme={buyTheme}
+                                currency="€"
+                                value={buyEuro}
+                                label={"Buy " + current.shortName + " for"}
+                                change={(val: number) => buyEuroHandler(val)}
                             />
-                            <Typography variant={"caption"}>{buyPercents} %</Typography>
+                            <InputForm
+                                data={current}
+                                theme={buyTheme}
+                                currency={
+                                    <Image
+                                        src={image}
+                                        width={30}
+                                        height={30}
+                                        alt={"rippler logo"}
+                                    />
+                                }
+                                value={buyCurrency}
+                                label={"Buy " + current.shortName}
+                                change={(val: number) => buyCurrencyHandler(val)}
+                            />
+                            <Box sx={{
+                                width: "100%",
+                                display: "grid",
+                                gridTemplateColumns: "3fr 1fr",
+                                textAlign: "center",
+                                marginLeft:"8px"
+                            }}>
+                                <Slider
+                                    aria-label="Buy (%)"
+                                    defaultValue={0}
+                                    color="success"
+                                    step={0.1}
+                                    onChange={buySliderHandler}
+                                    value={buyPercents}
+                                />
+                                <Typography variant={"caption"}>{buyPercents} %</Typography>
+                            </Box>
+
+                            <button className={"approve-btn mt-2"} onClick={() => approvePurchase()}>Approve purchase
+                            </button>
                         </Box>
 
-                        <button className={"approve-btn mt-2"} onClick={() => approvePurchase()}>Approve purchase</button>
-                    </Box>
-
-                    <Box className={"sale"}>
-                        <h5>Sale {current.shortName}</h5>
-                        <InputForm
-                            data={current}
-                            theme={sellTheme}
-                            currency="€"
-                            value={sellEuro}
-                            label={"Sell " + current.shortName + " for"}
-                            change={(val: number) => sellEuroHandler(val)}
-                        />
-                        <InputForm
-                            data={current}
-                            theme={sellTheme}
-                            currency={
-                                <Image
-                                    src={image}
-                                    width={30}
-                                    height={30}
-                                    alt={"rippler logo"}
-                                />
-                            }
-                            value={sellCurrency}
-                            label={"Sell " + current.shortName}
-                            change={(val: number) => sellCurrencyHandler(val)}
-                        />
-                        <Box sx={{ width: "100%", display:"grid", gridTemplateColumns:"3fr 1fr", textAlign: "center" }}>
-                            <Slider
-                                aria-label="Sell (%)"
-                                defaultValue={0}
-                                value={sellPercents}
-                                color="secondary"
-                                step={0.1}
-                                onChange={sellSliderHandler}
+                        <Box className={"sale"}>
+                            <h5>Sale {current.shortName}</h5>
+                            <InputForm
+                                data={current}
+                                theme={sellTheme}
+                                currency="€"
+                                value={sellEuro}
+                                label={"Sell " + current.shortName + " for"}
+                                change={(val: number) => sellEuroHandler(val)}
                             />
-                            <Typography variant={"caption"}>{sellPercents} %</Typography>
+                            <InputForm
+                                data={current}
+                                theme={sellTheme}
+                                currency={
+                                    <Image
+                                        src={image}
+                                        width={30}
+                                        height={30}
+                                        alt={"rippler logo"}
+                                    />
+                                }
+                                value={sellCurrency}
+                                label={"Sell " + current.shortName}
+                                change={(val: number) => sellCurrencyHandler(val)}
+                            />
+                            <Box sx={{
+                                width: "100%",
+                                display: "grid",
+                                gridTemplateColumns: "3fr 1fr",
+                                textAlign: "center",
+                                marginLeft:"8px"
+                            }}>
+                                <Slider
+                                    aria-label="Sell (%)"
+                                    defaultValue={0}
+                                    value={sellPercents}
+                                    color="secondary"
+                                    step={0.1}
+                                    onChange={sellSliderHandler}
+                                />
+                                <Typography variant={"caption"}>{sellPercents} %</Typography>
+                            </Box>
+
+                            <button className={"approve-btn mt-2"} onClick={() => approveSell()}>Approve sell</button>
                         </Box>
 
-                        <button className={"approve-btn mt-2"} onClick={() => approveSell()}>Approve sell</button>
-                    </Box>
+                    </Container>
+                    :
+                    <Container className={"finance-control flex"}>
+                        <Box className={"flex justify-center items-center"} sx = {{gridRow:"1/3", gridColumn:"1/3"}}>
+                            <Link href={"/login"} className={"mr-1"}>Sign in</Link>
+                            <span className={"mr-1"}>or</span>
+                            <Link href={"/registration"} className={"mr-1"}>sign up</Link>
+                            <span>to start!</span>
+                        </Box>
+                    </Container>
+                }
 
-                </Container>
             </section>
         </>
     )

@@ -28,7 +28,6 @@ export async function signin(e:React.MouseEvent<HTMLButtonElement>,username:stri
         getUserData(res.data.token).then(async function (data)  {
             setCookie("token", res.data.token);
             callback()
-            redirect("/dashboard")
             return null
         })
     }
