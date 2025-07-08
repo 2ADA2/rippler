@@ -42,3 +42,18 @@ export interface StockInterface {
 export interface StockHistoryInterface {
     [key: string]: StockOneInterface[];
 }
+export interface OperationInterface{
+    time: string,
+    currency: string,
+    currencyAmount: number,
+    euroAmount: number,
+    currencyPrice: number,
+}
+export interface OperationsHistoryInterface {
+    username: string,
+    operations: OperationInterface[],
+}
+export interface CreateOperationInterface {
+    wallet:CurrencyInterface[],
+    operations:OperationInterface[],
+}

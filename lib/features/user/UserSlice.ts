@@ -1,6 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {removeCookie, setCookie} from "typescript-cookie";
-import {CurrencyInterface, GetUserDataInterface} from "@/lib/globalInterfaces";
+import {
+    CurrencyInterface,
+    GetUserDataInterface,
+    OperationInterface,
+    OperationsHistoryInterface
+} from "@/lib/globalInterfaces";
 
 export interface UserData {
     isLoading: boolean
@@ -8,6 +13,7 @@ export interface UserData {
     error: string | null
     isLoggedIn: boolean
     user:GetUserDataInterface| null
+    operationsHistory:OperationInterface[]|null
 }
 
 const initialState: UserData = {
@@ -15,7 +21,8 @@ const initialState: UserData = {
     loadingStatus: "",
     isLoggedIn: false,
     error: null,
-    user:null
+    user:null,
+    operationsHistory:null
 }
 
 export const userSlice = createSlice({
@@ -28,10 +35,8 @@ export const userSlice = createSlice({
             state.loadingStatus = action.payload.name;
         },
         userLogout(state: UserData) {
-            state.error = null;
-            state.isLoading = false;
             removeCookie("token")
-            state.isLoggedIn = false;
+            window.location.reload();
         },
         setIsLoggedIn(state:UserData, action: { payload: { isLoggedIn: boolean } }){
             state.isLoggedIn = action.payload.isLoggedIn
@@ -47,8 +52,11 @@ export const userSlice = createSlice({
 
             userdata.wallet.wallet = wallet
             state.user = userdata
+        },
+        setOperationsHistory(state:UserData, action: { payload: { history: OperationInterface[] } }){
+            state.operationsHistory = action.payload.history
         }
     }
 })
-export const {setIsLoggedIn, setUserData} = userSlice.actions;
+export const {setIsLoggedIn, setUserData, setOperationsHistory, userLogout} = userSlice.actions;
 export default userSlice.reducer;

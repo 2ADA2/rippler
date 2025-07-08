@@ -11,7 +11,13 @@ import {IMAGES} from "@/utils/images";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {sortWallet} from "@/functions/sortWallet";
 import {NAMES} from "@/utils/names";
-import {CurrencyInterface, GetUserDataInterface, GetWalletInterface} from "@/lib/globalInterfaces";
+import {
+    CreateOperationInterface,
+    CurrencyInterface,
+    GetUserDataInterface,
+    GetWalletInterface,
+    WalletInterface
+} from "@/lib/globalInterfaces";
 import {Card, Slider, Typography} from "@mui/material";
 import Link from "next/link"
 import {useAppSelector} from "@/lib/hooks";
@@ -21,10 +27,11 @@ import {createOperation} from "@/functions/createOperation";
 import {getCookie} from "typescript-cookie";
 import {PriceTable} from "@/components/forCharts/priceTable";
 import {getUserData} from "@/functions/getUserData";
-import {setUserData} from "@/lib/features/user/UserSlice";
+import {setOperationsHistory, setUserData} from "@/lib/features/user/UserSlice";
 import {useDispatch} from "react-redux";
 import {formatter} from "@/utils/formatter";
 import {PriceHistory} from "@/components/forCharts/priceHistory";
+import {OperationsHistory} from "@/components/forCharts/operationsHistory";
 
 export default function Page() {
     const {stockData, stockCurrentData} = useAppSelector(state => state.stockReducer)
@@ -59,9 +66,7 @@ export default function Page() {
             const sorted = sortWallet(skeletonWallet, name);
             setWallet(sorted);
             setCurrent(sorted[1]);
-            console.log(wallet)
         } else {
-
             const sorted = sortWallet(user.wallet.wallet, name);
             setWallet(sorted);
             setCurrent(sorted[1]);
@@ -69,7 +74,7 @@ export default function Page() {
     }, [user]);
 
     useEffect(() => {
-        if (stockCurrentData && stockData && user && current) {
+        if (stockCurrentData && stockData && current) {
             setPrice(stockCurrentData[current.name].close)
             const stockExchangeData = stockData[current.name]
             const lastDay = stockExchangeData.at(-2)
@@ -77,13 +82,13 @@ export default function Page() {
                 setMinDay(lastDay.low)
                 setMaxDay(lastDay.high)
             }
-            const capital = wallet.reduce((s, i) => {
-                if (i.name === "Euro") return s + i.count;
-                return s + (i.count * stockCurrentData[i.name].close);
-
-            }, 0);
-            setCapital(capital.toLocaleString());
-
+            if(user){
+                const capital = wallet.reduce((s, i) => {
+                    if (i.name === "Euro") return s + i.count;
+                    return s + (i.count * stockCurrentData[i.name].close);
+                }, 0);
+                setCapital(capital.toLocaleString());
+            }
         }
 
     }, [stockCurrentData]);
@@ -91,7 +96,7 @@ export default function Page() {
     function buyCurrencyHandler(val: number) {
         setUserError("")
         setBuyCurrency(val)
-        const amount = Number((val * price).toFixed(5))
+        const amount = Math.floor(val * price *100000)/100000
         setBuyEuro(amount)
         setBuyPercents(Math.floor(10000 * val * price / wallet[0].count) / 100)
     }
@@ -99,7 +104,7 @@ export default function Page() {
     function buyEuroHandler(val: number, isConvertion = false) {
         setUserError("")
         setBuyEuro(val)
-        const amount = Number((val / price).toFixed(5))
+        const amount = Math.floor(val / price *100000)/100000
         setBuyCurrency(amount)
         if (!isConvertion) {
             setBuyPercents(Math.floor(10000 * val / wallet[0].count) / 100)
@@ -109,15 +114,14 @@ export default function Page() {
     function buySliderHandler(e: Event, newVal: number) {
         if (e.target) {
             setBuyPercents(newVal)
-            buyEuroHandler(Number((wallet[0].count * newVal / 100).toFixed(5)), true)
+            buyEuroHandler((Math.floor(wallet[0].count * newVal * 1000)/100000), true)
         }
     }
-
 
     function sellCurrencyHandler(val: number, isConvertion = false) {
         setSellCurrency(val)
         setUserError("")
-        const amount = Number((val * price).toFixed(5))
+        const amount = Math.floor(val * price *100000)/100000
         setSellEuro(amount)
         if (!isConvertion) {
             setSellPercents(Math.floor(10000 * val / wallet[1].count) / 100)
@@ -128,7 +132,7 @@ export default function Page() {
     function sellEuroHandler(val: number) {
         setUserError("")
         setSellEuro(val)
-        const amount = Number((val / price).toFixed(5))
+        const amount = (Math.floor(val / price *100000)/100000)
         setSellCurrency(amount)
         setSellPercents(Math.floor(10000 * val / price / wallet[1].count) / 100)
     }
@@ -136,10 +140,9 @@ export default function Page() {
     function sellSliderHandler(e: Event | null, newVal: number) {
         if (e) {
             setSellPercents(newVal)
-            sellCurrencyHandler(Number((wallet[1].count * newVal / 100).toFixed(5)), true)
+            sellCurrencyHandler(Math.floor(wallet[1].count * newVal * 1000)/100000, true)
         }
     }
-
 
     function approvePurchase() {
         const token = getCookie("token")
@@ -167,11 +170,16 @@ export default function Page() {
             }
             setUserError("")
             setIsWalletLoading(true)
-            createOperation(token, "buy", buyEuro, current.name).then(() => {
-                getUserData(token).then((data: GetUserDataInterface) => {
-                    dispatch(setUserData({userData: data}))
+            createOperation(token, "buy", buyEuro, current.name).then((data:CreateOperationInterface) => {
+                if(data.wallet){
+                    setWallet(data.wallet)
+                    let newUserData = JSON.parse(JSON.stringify(data))
+                    newUserData.wallet.wallet = data.wallet
+                    dispatch(setUserData({userData: newUserData}))
+                    dispatch(setOperationsHistory({history:data.operations}))
                     setIsWalletLoading(false)
-                })
+                }
+
             })
             setUserError("")
             setBuyEuro(0)
@@ -205,11 +213,15 @@ export default function Page() {
                 return
             }
             setIsWalletLoading(true)
-            createOperation(token, "sell", sellCurrency, current.name).then(() => {
-                getUserData(token).then((data: GetUserDataInterface) => {
-                    dispatch(setUserData({userData: data}))
+            createOperation(token, "sell", sellCurrency, current.name).then((data:CreateOperationInterface) => {
+                if(data.wallet){
+                    setWallet(data.wallet)
+                    let newUserData = JSON.parse(JSON.stringify(data))
+                    newUserData.wallet.wallet = data.wallet
+                    dispatch(setUserData({userData: newUserData}))
+                    dispatch(setOperationsHistory({history:data.operations}))
                     setIsWalletLoading(false)
-                })
+                }
             })
             setUserError("")
             setSellEuro(0)
@@ -223,7 +235,7 @@ export default function Page() {
     return (
         <>
             <section className={"trade-container"}>
-                <Box className={"trade-header"}
+                <Box className={"trade-header rounded-xs"}
                      sx={{display: "grid", alignItems: "center", gridTemplateColumns: " 60px repeat(8, 1fr)"}}>
                     <Image
                         src={image}
@@ -273,23 +285,23 @@ export default function Page() {
                     </div>
                 </Box>
 
-                <Container className="chart-container">
+                <Container className="chart-container rounded-xs">
                     <div style={{width: "99%"}}>
                         <MainChart/>
                     </div>
                 </Container>
 
-                <Container className={"history flex flex-col gap-2 overflow-hidden"}>
+                <Container className={"history flex flex-col gap-2 overflow-hidden pl-0 rounded-xs"} style = {{padding:"0 10px 0 10px"}}>
                     <PriceTable/>
                     {current && <PriceHistory currency={current}/>}
                 </Container>
 
-                <Container className="orders">
-                orders
+                <Container className="orders" style={{padding:"0 10px 0 10px"}}>
+                    <OperationsHistory/>
                 </Container>
 
                 {(user) ?
-                    <Container className={"finance-control"}>
+                    <Container className={"finance-control rounded-xs"}>
                         <div className={"finance-control-header mt-2"}>
                             <div className={"pb-4 flex items-center gap-2 "}>
                                 <Link href={"/finance"}>Your wallet</Link>
@@ -457,7 +469,7 @@ export default function Page() {
 
                     </Container>
                     :
-                    <Container className={"finance-control flex"}>
+                    <Container className={"finance-control flex rounded-xs"}>
                         <Box className={"flex justify-center items-center"} sx = {{gridRow:"1/3", gridColumn:"1/3"}}>
                             <Link href={"/login"} className={"mr-1"}>Sign in</Link>
                             <span className={"mr-1"}>or</span>

@@ -60,7 +60,7 @@ export function PriceTable() {
     }
 
     return (
-        <Card className={"flex flex-col gap-1 w-full priceTable mt-5"}>
+        <Card className={"flex flex-col gap-1 w-full priceTable mt-2"} sx={{background:"rgb(17,17,17)"}}>
             {formatted.map((e) => {
                 return (
                     <Box key = {e.name} sx = {{gridTemplateColumns:"40px 50px repeat(3, 1fr) 40px"}} className={"p-1 grid items-center text-center g-1"}>

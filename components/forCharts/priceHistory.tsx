@@ -1,12 +1,9 @@
 "use client"
 import {Box} from "@mui/system";
-import {CurrencyInterface, StockOneInterface} from "@/lib/globalInterfaces";
-import ArrowDropUpRoundedIcon from '@mui/icons-material/ArrowDropUpRounded';
-import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded';
-import {useEffect, useMemo, useState} from "react";
+import {CurrencyInterface} from "@/lib/globalInterfaces";
+import {useMemo} from "react";
 import {useAppSelector} from "@/lib/hooks";
-import {CURRENCYDATA} from "@/utils/names";
-import {Card, CardContent, CardHeader, Icon, Typography} from "@mui/material";
+import {Card, CardContent, CardHeader, Typography} from "@mui/material";
 import Image from "next/image";
 import {IMAGES} from "@/utils/images";
 import {formatter} from "@/utils/formatter";
